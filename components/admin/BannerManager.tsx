@@ -12,7 +12,10 @@ const BannerManager: React.FC<BannerManagerProps> = ({
   config,
   onUpdate,
 }) => {
-  const banners = config?.banners ?? [];
+  const banners = useMemo(
+  () => config?.banners ?? [],
+  [config?.banners]
+);
 
   const inputBase =
     "w-full bg-white border border-zinc-200 px-4 py-3 text-xs outline-none focus:border-black transition-all";
@@ -81,16 +84,17 @@ const BannerManager: React.FC<BannerManagerProps> = ({
         const clone: BannerConfig = { ...banner };
 
         if (field.includes(".")) {
-          const [parent, child] = field.split(".");
-          const parentKey = parent as keyof BannerConfig;
+  const [parent, child] = field.split(".");
+  const parentKey = parent as keyof BannerConfig;
 
-          clone[parentKey] = {
-            ...(clone[parentKey] as Record<string, unknown>),
-            [child]: value,
-          } as any;
-        } else {
-          (clone as any)[field] = value;
-        }
+  const parentValue = clone[parentKey];
+
+  if (typeof parentValue === "object" && parentValue !== null) {
+    (parentValue as Record<string, unknown>)[child] = value;
+  }
+} else {
+  (clone as unknown as Record<string, unknown>)[field] = value;
+}
 
         return clone;
       });
