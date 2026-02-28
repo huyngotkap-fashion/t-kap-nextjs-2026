@@ -95,7 +95,7 @@ export interface MenuItem {
 
 export interface BrandNavItem {
   id: string;
-  label: string;
+  label: { en: string; vi: string };
   targetCategory: string;
 }
 
@@ -142,6 +142,7 @@ export interface LandingPage {
 
 export interface HiddenLink {
   id: string;
+  slug: string;
   title: string;
   url: string;
   isActive: boolean;
