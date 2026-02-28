@@ -1,4 +1,3 @@
-
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { getDocumentOnce } from "@/services/firestoreService";
@@ -10,23 +9,55 @@ type Props = {
   params: { slug: string };
 };
 
+const baseUrl = process.env.APP_URL || "https://t-kap.com.vn";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = params.slug;
-  const parts = slug.split("-");
-  const id = parts[parts.length - 1];
+  const id = slug.split("-").pop() || "";
 
-  const product = await getDocumentOnce("products", id) as any;
+  const product: any = await getDocumentOnce("products", id);
 
   if (!product) {
     return {
       title: "Product Not Found | T-kap Fashion",
+      description: "The product you are looking for does not exist.",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
+  const productUrl = `${baseUrl}/product/${slug}`;
+
   return {
     title: `${product.name} | T-kap Fashion Luxury`,
-    description: product.description || `Discover ${product.name} at T-kap Fashion. Masterfully engineered fabrics meeting a century of tailoring heritage.`,
+    description:
+      product.description ||
+      `Discover ${product.name} at T-kap Fashion. Premium bespoke tailoring crafted for modern gentlemen.`,
+    alternates: {
+      canonical: productUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
     openGraph: {
+      title: product.name,
+      description: product.description,
+      url: productUrl,
+      siteName: "T-kap Fashion",
+      type: "website",
+      images: [
+        {
+          url: product.imageUrl,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
       title: product.name,
       description: product.description,
       images: [product.imageUrl],
@@ -36,32 +67,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const slug = params.slug;
-  const parts = slug.split("-");
-  const id = parts[parts.length - 1];
-  const product = await getDocumentOnce("products", id) as any;
+  const id = slug.split("-").pop() || "";
 
-  const jsonLd = product ? {
+  const product: any = await getDocumentOnce("products", id);
+
+  if (!product) return null;
+
+  const productUrl = `${baseUrl}/product/${slug}`;
+
+  const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": product.name,
-    "image": product.imageUrl,
-    "description": product.description,
-    "brand": {
+    name: product.name,
+    image: [product.imageUrl],
+    description: product.description,
+    sku: product.id,
+    brand: {
       "@type": "Brand",
-      "name": product.brand || "T-kap Fashion"
+      name: product.brand || "T-kap Fashion",
     },
-    "offers": {
+    offers: {
       "@type": "Offer",
-      "url": `${process.env.APP_URL}/product/${slug}`,
-      "priceCurrency": "USD",
-      "price": product.price,
-      "availability": "https://schema.org/InStock"
-    }
-  } : null;
+      url: productUrl,
+      priceCurrency: "USD",
+      price: product.price,
+      availability: "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
 
   return (
     <>
-      {jsonLd && <JsonLd data={jsonLd} />}
+      <JsonLd data={jsonLd} />
       <ClientApp />
     </>
   );

@@ -1,45 +1,83 @@
+import { MetadataRoute } from "next";
+import { getCollectionOnce } from "@/services/firestoreService";
 
-import { MetadataRoute } from 'next';
-import { getCollectionOnce } from '@/services/firestoreService';
+function slugify(text: any) {
+  if (!text || typeof text !== "string") return "";
+
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.APP_URL || 'https://t-kap.com.vn';
+  const baseUrl = process.env.APP_URL || "https://t-kap.com.vn";
 
-  // Fetch all products and blogs
-  const products = await getCollectionOnce('products');
-  const blogs = await getCollectionOnce('blogs');
+  const products = await getCollectionOnce("products");
+  const blogs = await getCollectionOnce("blogs");
 
-  const productEntries = products
-    .filter((p: any) => p.name && typeof p.name === 'string')
+  // ✅ Product URLs
+  const productEntries: MetadataRoute.Sitemap = products
+    .filter((p: any) => typeof p.name === "string")
     .map((p: any) => ({
-      url: `${baseUrl}/product/${p.name.toLowerCase().replace(/\s+/g, '-')}-${p.id}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
+      url: `${baseUrl}/product/${slugify(p.name)}-${p.id}`,
+      lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+      changeFrequency: "weekly",
       priority: 0.8,
     }));
 
-  const blogEntries = blogs
-    .filter((b: any) => b.title && typeof b.title === 'string')
+  // ✅ Blog URLs
+  const blogEntries: MetadataRoute.Sitemap = blogs
+    .filter((b: any) => typeof b.title === "string")
     .map((b: any) => ({
-      url: `${baseUrl}/blog/${b.title.toLowerCase().replace(/\s+/g, '-')}-${b.id}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
+      url: `${baseUrl}/blog/${slugify(b.title)}-${b.id}`,
+      lastModified: b.updatedAt ? new Date(b.updatedAt) : new Date(),
+      changeFrequency: "monthly",
       priority: 0.6,
     }));
 
-  const staticPages = [
-    '',
-    '/men',
-    '/women',
-    '/journal',
-    '/stores',
-    '/quotation',
-  ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: route === '' ? 1 : 0.9,
-  }));
+  // ✅ Static pages
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/men`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/women`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/journal`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/stores`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/quotation`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+  ];
 
   return [...staticPages, ...productEntries, ...blogEntries];
 }
