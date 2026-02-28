@@ -8,58 +8,68 @@ const baseUrl = process.env.APP_URL || "https://t-kap.com.vn";
 
 export const metadata: Metadata = {
   title:
-    "T-kap Fashion | Bespoke Suit Vietnam | Luxury Tailoring in Ho Chi Minh City",
+    "T-Kap | Sản Xuất Áo Polo & Đồng Phục Doanh Nghiệp Cao Cấp",
+
   description:
-    "T-kap Fashion is a luxury bespoke tailoring house in Vietnam, crafting premium suits, refined formalwear, and timeless elegance for modern gentlemen and women.",
+    "T-Kap chuyên sản xuất áo polo và đồng phục doanh nghiệp cao cấp tại Việt Nam: polo, sơ mi, veston, quần tây, váy công sở, áo thun, bảo hộ lao động. Thiết kế chuẩn form – sản xuất trực tiếp – giá cạnh tranh.",
+
   alternates: {
     canonical: baseUrl,
   },
+
   robots: {
     index: true,
     follow: true,
   },
+
   openGraph: {
-    title: "T-kap Fashion | Luxury Bespoke Tailoring in Vietnam",
+    title:
+      "T-Kap | Xưởng Sản Xuất Áo Polo & Đồng Phục Doanh Nghiệp",
     description:
-      "Discover premium bespoke suits and luxury tailoring in Ho Chi Minh City.",
+      "Xưởng sản xuất áo polo và đồng phục doanh nghiệp cao cấp. Thiết kế riêng – may trực tiếp – tối ưu chi phí cho doanh nghiệp.",
     url: baseUrl,
-    siteName: "T-kap Fashion",
+    siteName: "T-Kap",
     type: "website",
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`, // nên có ảnh này trong public
+        url: `${baseUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
+        alt: "T-Kap Sản Xuất Áo Polo & Đồng Phục Doanh Nghiệp",
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "T-kap Fashion | Luxury Bespoke Tailoring",
+    title: "T-Kap | Sản Xuất Áo Polo & Đồng Phục",
     description:
-      "Premium bespoke tailoring and luxury suits crafted in Vietnam.",
+      "Xưởng may áo polo và đồng phục doanh nghiệp cao cấp tại Việt Nam.",
+    images: [`${baseUrl}/og-image.jpg`],
   },
+
   keywords: [
-    "bespoke suit Vietnam",
-    "luxury tailoring Ho Chi Minh City",
-    "custom suit Vietnam",
-    "premium menswear Vietnam",
-    "T-kap Fashion",
+    "sản xuất áo polo",
+    "xưởng may áo polo",
+    "đồng phục doanh nghiệp",
+    "áo polo đồng phục",
+    "may đồng phục công ty",
+    "xưởng may đồng phục giá tốt",
+    "T-Kap",
   ],
 };
 
 export default function Home() {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: "T-kap Fashion",
+    "@type": "Organization",
+    name: "T-Kap",
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description:
-      "Luxury bespoke tailoring house in Vietnam offering premium custom suits and refined craftsmanship.",
+      "T-Kap là xưởng sản xuất áo polo và đồng phục doanh nghiệp cao cấp tại Việt Nam.",
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Ho Chi Minh City",
       addressCountry: "VN",
     },
     sameAs: [
