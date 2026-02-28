@@ -1,0 +1,8 @@
+{
+  "name": "T-kap Fashion | Next.js Luxury Specialist",
+  "description": "Premium Fashion and Tailoring - Optimized with Next.js",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
