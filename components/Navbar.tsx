@@ -157,8 +157,10 @@ const Navbar: React.FC<NavbarProps> = ({
       {/* Top Banner */}
       <div className="hidden md:block bg-white text-black py-2.5 border-b border-zinc-100 text-center">
         <p className="text-[9px] font-bold uppercase tracking-[0.25em]">
-          T-KAP LUXURY SPECIALIST — PREMIUM TAILORING SINCE 2025
-        </p>
+  {language === 'vi'
+    ? 'T-KAP – CHUYÊN SẢN XUẤT ÁO POLO & ĐỒNG PHỤC DOANH NGHIỆP'
+    : 'T-KAP – PREMIUM POLO & CORPORATE UNIFORM MANUFACTURER'}
+</p>
       </div>
 
       {/* Main Nav */}
@@ -192,7 +194,7 @@ const Navbar: React.FC<NavbarProps> = ({
                         : 'text-zinc-500 hover:text-white hover:bg-zinc-900'
                     }`}
                   >
-                    {brand.label}
+                    {brand.label?.[language] || brand.label?.vi}
                   </a>
                 );
               })}
@@ -242,7 +244,9 @@ const Navbar: React.FC<NavbarProps> = ({
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
-                <button onClick={onLogout} className="text-zinc-500 hover:text-white text-[9px] font-bold uppercase tracking-widest">Logout</button>
+                <button onClick={onLogout} className="text-zinc-500 hover:text-white text-[9px] font-bold uppercase tracking-widest">
+  {language === 'vi' ? 'ĐĂNG XUẤT' : 'LOGOUT'}
+</button>
               </div>
             ) : (
               <button onClick={onOpenAuth} className="p-2 text-zinc-500 hover:text-white transition-colors" aria-label="Login">
@@ -299,7 +303,11 @@ const Navbar: React.FC<NavbarProps> = ({
                 <div className="flex flex-col justify-center">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">{p.brand}</span>
                   <h4 className="text-white text-sm font-black uppercase mb-2 leading-snug">{p.name}</h4>
-                  <span className="text-white font-bold text-xs">{p.pricingType === 'quotation' ? 'QUOTE' : `$${p.price}`}</span>
+                  <span className="text-white font-bold text-xs">
+  {p.pricingType === 'quotation'
+    ? (language === 'vi' ? 'BÁO GIÁ' : 'QUOTE')
+    : `$${p.price}`}
+</span>
                 </div>
               </a>
             ))}
@@ -321,7 +329,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   isBrandActive(brand.targetCategory) ? 'bg-white text-black border-white' : 'border-zinc-800 text-zinc-500'
                 }`}
               >
-                {brand.label}
+                {brand.label?.[language] || brand.label?.vi}
               </a>
             ))}
           </div>

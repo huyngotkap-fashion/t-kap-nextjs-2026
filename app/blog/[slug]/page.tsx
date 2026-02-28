@@ -18,6 +18,14 @@ function extractIdFromSlug(slug: string) {
   return parts[parts.length - 1];
 }
 
+function getTitle(blog: any) {
+  if (!blog?.title) return "";
+
+  if (typeof blog.title === "string") return blog.title;
+
+  return blog.title?.vi || blog.title?.en || "";
+}
+
 function getRawContent(blog: any) {
   if (!blog?.content) return "";
 
@@ -34,8 +42,10 @@ function getDescription(blog: any) {
   if (blog?.excerpt) return blog.excerpt;
 
   const raw = getRawContent(blog);
-  return stripHtml(raw).substring(0, 160) || 
-    "Tin tức mới nhất từ T-Kap – chuyên sản xuất áo polo và đồng phục doanh nghiệp cao cấp.";
+  return (
+    stripHtml(raw).substring(0, 160) ||
+    "Tin tức mới nhất từ T-Kap – chuyên sản xuất áo polo và đồng phục doanh nghiệp cao cấp."
+  );
 }
 
 function formatDate(date: any) {
@@ -61,22 +71,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!blog) {
     return {
       title: "Bài viết không tồn tại | T-Kap",
-      description: "Trang tin tức T-Kap – chuyên sản xuất áo polo & đồng phục doanh nghiệp.",
+      description:
+        "Trang tin tức T-Kap – chuyên sản xuất áo polo & đồng phục doanh nghiệp.",
     };
   }
 
-  const url = `https://t-kap.com.vn/blog/${slug}`;
+  const title = getTitle(blog);
   const description = getDescription(blog);
+  const url = `https://t-kap.com.vn/blog/${slug}`;
   const publishedTime = formatDate(blog.createdAt);
 
   return {
-    title: `${blog.title} | T-Kap Journal`,
+    title: `${title} | T-Kap Journal`,
     description,
+
     keywords: blog.tags || [
       "áo polo đồng phục",
       "sản xuất áo polo",
       "đồng phục doanh nghiệp",
-      "T-Kap Fashion",
+      "T-Kap",
       "xưởng may đồng phục cao cấp",
     ],
 
@@ -85,7 +98,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
 
     openGraph: {
-      title: blog.title,
+      title,
       description,
       url,
       type: "article",
@@ -95,14 +108,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: blog.imageUrl || "https://t-kap.com.vn/og-image.jpg",
           width: 1200,
           height: 630,
-          alt: blog.title,
+          alt: title,
         },
       ],
     },
 
     twitter: {
       card: "summary_large_image",
-      title: blog.title,
+      title,
       description,
       images: [blog.imageUrl || "https://t-kap.com.vn/og-image.jpg"],
     },
@@ -121,15 +134,16 @@ export default async function BlogPage({ params }: Props) {
 
   if (!blog) return null;
 
-  const url = `https://t-kap.com.vn/blog/${slug}`;
+  const title = getTitle(blog);
   const description = getDescription(blog);
+  const url = `https://t-kap.com.vn/blog/${slug}`;
   const published = formatDate(blog.createdAt);
   const modified = formatDate(blog.updatedAt || blog.createdAt);
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: blog.title,
+    headline: title,
     image: blog.imageUrl || "https://t-kap.com.vn/og-image.jpg",
     description,
     mainEntityOfPage: {
