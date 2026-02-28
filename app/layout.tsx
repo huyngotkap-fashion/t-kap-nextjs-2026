@@ -22,12 +22,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL || "https://t-kap.com.vn"),
 
   title: {
-    default: "T-kap Fashion | Luxury Bespoke Tailoring in Vietnam",
+    default: "T-Kap | Sản Xuất Áo Polo & Đồng Phục Doanh Nghiệp",
     template: "%s | T-kap Fashion",
   },
 
   description:
-    "T-kap Fashion – Premium bespoke tailoring & executive menswear in Vietnam. Custom suits, refined craftsmanship, and timeless elegance.",
+    "T-Kap chuyên sản xuất áo polo và đồng phục doanh nghiệp cao cấp: sơ mi, veston, quần tây, váy công sở, áo thun, bảo hộ lao động. Thiết kế chuẩn form – sản xuất trực tiếp – giá cạnh tranh.",
 
   keywords: [
     "T-kap Fashion",
