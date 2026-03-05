@@ -15,6 +15,7 @@ interface NavigationManagerProps {
 
 const inputBase =
   "w-full bg-white border border-zinc-200 px-4 py-3 text-xs outline-none focus:border-black transition-all";
+
 const labelBase =
   "text-[9px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block";
 
@@ -77,17 +78,17 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
   /* ============================ BRAND ITEMS ============================ */
 
   const addBrandItem = () => {
-  const newItem: BrandNavItem = {
-    id: crypto.randomUUID(),
-    label: { en: "BRAND", vi: "THƯƠNG HIỆU" },
-    targetCategory: "/",
-  };
+    const newItem: BrandNavItem = {
+      id: crypto.randomUUID(),
+      label: { en: "Brand", vi: "Thương hiệu" },
+      targetCategory: "/",
+    };
 
-  onUpdate({
-    ...config,
-    brandNavItems: [...config.brandNavItems, newItem],
-  });
-};
+    onUpdate({
+      ...config,
+      brandNavItems: [...config.brandNavItems, newItem],
+    });
+  };
 
   const removeBrandItem = (id: string) => {
     onUpdate({
@@ -100,8 +101,8 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
 
   const addHiddenLink = () => {
     const newLink: HiddenLink = {
-      id: crypto.randomUUID(), // internal immutable id
-      slug: `link-${Date.now()}`, // editable slug
+      id: crypto.randomUUID(),
+      slug: `link-${Date.now()}`,
       title: "Trang nhúng mới",
       url: "https://",
       isActive: true,
@@ -128,11 +129,13 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
   return (
     <div className="space-y-20 pb-40">
       {/* ================= HEADER MENU ================= */}
+
       <section>
         <div className="flex justify-between items-center mb-10 border-b pb-4">
           <h3 className="text-xl font-black uppercase">
             Thanh điều hướng chính
           </h3>
+
           <button
             onClick={addNavItem}
             className="bg-black text-white px-6 py-2 text-[10px] font-bold uppercase"
@@ -147,6 +150,7 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
               key={item.id}
               className="bg-white border p-6 shadow-sm space-y-4"
             >
+              {/* VI */}
               <div>
                 <label className={labelBase}>Tên hiển thị (VI)</label>
                 <input
@@ -161,6 +165,22 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                 />
               </div>
 
+              {/* EN */}
+              <div>
+                <label className={labelBase}>Tên hiển thị (EN)</label>
+                <input
+                  value={item.label.en}
+                  onChange={(e) =>
+                    updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                      ...i,
+                      label: { ...i.label, en: e.target.value },
+                    }))
+                  }
+                  className={inputBase}
+                />
+              </div>
+
+              {/* SLUG */}
               <div>
                 <label className={labelBase}>Đường dẫn</label>
                 <input
@@ -187,11 +207,13 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
       </section>
 
       {/* ================= HIDDEN LINKS ================= */}
+
       <section className="bg-zinc-50 p-10 border">
         <div className="flex justify-between items-center mb-10 border-b pb-4">
           <h3 className="text-xl font-black uppercase">
             Quản lý Link Ẩn
           </h3>
+
           <button
             onClick={addHiddenLink}
             className="bg-blue-600 text-white px-6 py-2 text-[10px] font-bold uppercase"
@@ -254,9 +276,7 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                       )
                     }
                     className={`${inputBase} ${
-                      !isValidUrl(link.url)
-                        ? "border-red-400"
-                        : ""
+                      !isValidUrl(link.url) ? "border-red-400" : ""
                     }`}
                   />
                 </div>
@@ -293,11 +313,13 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
       </section>
 
       {/* ================= BRAND TABS ================= */}
+
       <section>
         <div className="flex justify-between items-center mb-10 border-b pb-4">
           <h3 className="text-xl font-black uppercase">
             Danh mục Thương hiệu
           </h3>
+
           <button
             onClick={addBrandItem}
             className="bg-black text-white px-6 py-2 text-[10px] font-bold uppercase"
@@ -319,24 +341,45 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                 ✕
               </button>
 
+              {/* VI */}
               <div>
-                <label className={labelBase}>Tên</label>
+                <label className={labelBase}>Tên (VI)</label>
                 <input
-  value={item.label.vi}
-  onChange={(e) =>
-    updateArrayItem<BrandNavItem>(
-      "brandNavItems",
-      item.id,
-      (i) => ({
-        ...i,
-        label: { ...i.label, vi: e.target.value },
-      })
-    )
-  }
-  className={inputBase}
-/>
+                  value={item.label.vi}
+                  onChange={(e) =>
+                    updateArrayItem<BrandNavItem>(
+                      "brandNavItems",
+                      item.id,
+                      (i) => ({
+                        ...i,
+                        label: { ...i.label, vi: e.target.value },
+                      })
+                    )
+                  }
+                  className={inputBase}
+                />
               </div>
 
+              {/* EN */}
+              <div>
+                <label className={labelBase}>Tên (EN)</label>
+                <input
+                  value={item.label.en}
+                  onChange={(e) =>
+                    updateArrayItem<BrandNavItem>(
+                      "brandNavItems",
+                      item.id,
+                      (i) => ({
+                        ...i,
+                        label: { ...i.label, en: e.target.value },
+                      })
+                    )
+                  }
+                  className={inputBase}
+                />
+              </div>
+
+              {/* SLUG */}
               <div>
                 <label className={labelBase}>Slug</label>
                 <input

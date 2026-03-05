@@ -166,7 +166,11 @@ const QuotationForm: React.FC<QuotationFormProps> = ({
               displayCartItems.map((item, idx) => (
                 <div key={`${item.id}-${idx}`} className="flex gap-4 p-4 border border-black bg-zinc-50">
                   <div className="w-16 h-20 bg-zinc-100 shrink-0 overflow-hidden">
-                    <img src={item.imageUrl} className="w-full h-full object-cover grayscale" alt="" />
+                    <img
+  src={item.imageUrl}
+  className="w-full h-full object-cover grayscale"
+  alt={item.name}
+/>
                   </div>
                   <div className="flex-1">
                     <h4 className="text-[10px] font-black uppercase leading-tight">{item.name}</h4>
@@ -183,7 +187,11 @@ const QuotationForm: React.FC<QuotationFormProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quotationOnlyProducts.map(p => (
                   <div key={p.id} onClick={() => toggleProduct(p.id)} className={`flex gap-4 p-4 border cursor-pointer transition-all ${formData.selectedProductIds.includes(p.id) ? 'border-black bg-zinc-50' : 'border-zinc-100'}`}>
-                    <div className="w-16 h-20 bg-zinc-100 overflow-hidden"><img src={p.imageUrl} className="w-full h-full object-cover grayscale" /></div>
+                    <div className="w-16 h-20 bg-zinc-100 overflow-hidden"><img
+  src={p.imageUrl}
+  className="w-full h-full object-cover grayscale"
+  alt={p.name}
+/></div>
                     <div className="flex-1">
                       <h4 className="text-[10px] font-bold uppercase">{p.name}</h4>
                       <p className="text-[9px] font-black mt-1">

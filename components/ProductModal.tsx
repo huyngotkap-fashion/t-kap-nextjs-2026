@@ -97,7 +97,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
                   {m.type === 'video' ? (
                     <div className="w-full h-full bg-black flex items-center justify-center text-[10px] font-black text-white">MOV</div>
                   ) : (
-                    <img src={m.url} className="w-full h-full object-cover" />
+                    <img
+  src={m.url}
+  alt={product.name}
+  className="w-full h-full object-cover"
+/>
                   )}
                 </button>
               ))}

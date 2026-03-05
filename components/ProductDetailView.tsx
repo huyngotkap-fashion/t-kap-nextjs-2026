@@ -85,7 +85,11 @@ const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot, language }) => {
       <div className={getTooltipPositionClasses()}>
         {hotspot.imageUrl && (
           <div className="aspect-video overflow-hidden bg-zinc-100">
-            <img src={hotspot.imageUrl} className="w-full h-full object-cover" alt="" />
+            <img
+  src={hotspot.imageUrl}
+  className="w-full h-full object-cover"
+  alt={hotspot.title[language] || hotspot.title['vi']}
+/>
           </div>
         )}
         <div className="p-5 space-y-2">
@@ -202,7 +206,11 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                   {m.type === 'video' ? (
                     <div className="w-full h-full bg-black flex items-center justify-center text-[10px] font-black text-white">PLAY VIDEO</div>
                   ) : (
-                    <img src={m.url} className="w-full h-full object-cover" />
+                    <img
+  src={m.url}
+  alt={product.name}
+  className="w-full h-full object-cover"
+/>
                   )}
                 </button>
               ))}

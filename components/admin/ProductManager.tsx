@@ -280,7 +280,11 @@ const ProductManager: React.FC<ProductManagerProps> = ({
                        addDetailHotspot(hotspotEditorMediaIdx!, x, y);
                     }}
                   >
-                     <img src={form.media![hotspotEditorMediaIdx!].url} className="w-full h-full object-cover" />
+                     <img 
+  src={form.media![hotspotEditorMediaIdx!].url} 
+  className="w-full h-full object-cover"
+  alt="Product detail hotspot editor"
+/>
                      {form.media![hotspotEditorMediaIdx!].hotspots?.map((hs, hIdx) => (
                        <div 
                          key={hs.id} 
@@ -336,7 +340,11 @@ const ProductManager: React.FC<ProductManagerProps> = ({
         {products.map(p => (
           <div key={p.id} className={`bg-white border border-zinc-100 p-4 shadow-sm hover:shadow-xl transition-all group ${p.status === 'hidden' ? 'opacity-70' : ''}`}>
             <div className="aspect-[3/4] bg-zinc-100 mb-4 overflow-hidden relative">
-              <img src={p.imageUrl} className={`w-full h-full object-cover transition-transform group-hover:scale-110 ${p.status === 'hidden' ? 'grayscale opacity-50' : ''}`} alt="" />
+              <img 
+  src={p.imageUrl} 
+  className={`w-full h-full object-cover transition-transform group-hover:scale-110 ${p.status === 'hidden' ? 'grayscale opacity-50' : ''}`} 
+  alt={p.name}
+/>
               <div className="absolute top-2 left-2 flex flex-col gap-1">
                 {p.status === 'hidden' && <span className="bg-zinc-500 text-white text-[7px] font-black px-2 py-0.5 uppercase w-fit">ĐANG ẨN</span>}
                 {p.pricingType === 'quotation' && <span className="bg-black text-white text-[7px] font-black px-2 py-0.5 uppercase w-fit">BÁO GIÁ</span>}

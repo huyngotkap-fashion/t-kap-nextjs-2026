@@ -320,7 +320,7 @@ const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config,
                               {selectedProduct ? (
                                 <div className="flex items-center gap-3 p-2 bg-white border border-zinc-200">
                                   <div className="w-8 h-10 bg-zinc-100 shrink-0 overflow-hidden">
-                                    <img src={selectedProduct.imageUrl} className="w-full h-full object-cover grayscale" />
+                                    <img src={heritage.imageMain} className="w-full h-full object-cover grayscale" alt="Heritage main preview" />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-[9px] font-black uppercase truncate">{selectedProduct.name}</p>
@@ -349,7 +349,7 @@ const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config,
                                           onClick={() => updateHotspotProductId(idx, hsIdx, p.id)}
                                           className="p-2 flex items-center gap-3 hover:bg-zinc-50 cursor-pointer border-b border-zinc-50 last:border-none"
                                         >
-                                          <div className="w-6 h-8 bg-zinc-100 overflow-hidden"><img src={p.imageUrl} className="w-full h-full object-cover grayscale" /></div>
+                                          <div className="w-6 h-8 bg-zinc-100 overflow-hidden"><img src={heritage.imageSecondary} className="w-full h-full object-cover grayscale" alt="Heritage secondary preview" /></div>
                                           <div className="flex-1 min-w-0">
                                             <p className="text-[8px] font-bold uppercase truncate">{p.name}</p>
                                             <p className="text-[7px] text-zinc-400 uppercase">{p.brand}</p>
