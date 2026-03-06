@@ -165,6 +165,15 @@ const ProductManager: React.FC<ProductManagerProps> = ({
                 <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className={inputBase} />
               </div>
               <div>
+  <label className={labelBase}>Thương hiệu</label>
+  <input
+    value={form.brand || ""}
+    onChange={(e) => setForm({ ...form, brand: e.target.value })}
+    placeholder="Ví dụ: BOSS, Lacoste, Nike..."
+    className={inputBase}
+  />
+</div>
+              <div>
   <label className={labelBase}>Danh mục</label>
   <select
   value={form.category || 'men'}
