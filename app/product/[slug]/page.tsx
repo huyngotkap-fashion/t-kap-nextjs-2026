@@ -30,11 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const productUrl = `${baseUrl}/product/${slug}`;
 
+  const description =
+    product.description ||
+    `Discover ${product.name} at T-kap Fashion. Premium bespoke tailoring crafted for modern gentlemen.`;
+
   return {
-    title: `${product.name} | T-kap Fashion Luxury`,
-    description:
-      product.description ||
-      `Discover ${product.name} at T-kap Fashion. Premium bespoke tailoring crafted for modern gentlemen.`,
+    title: `${product.name} | T-kap Fashion`,
+    description,
     alternates: {
       canonical: productUrl,
     },
@@ -42,25 +44,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       index: true,
       follow: true,
     },
+
     openGraph: {
-      title: product.name,
-      description: product.description,
-      url: productUrl,
-      siteName: "T-kap Fashion",
-      type: "website",
-      images: [
-        {
-          url: product.imageUrl,
-          width: 1200,
-          height: 630,
-        },
-      ],
+  title: product.name,
+  description: product.description,
+  url: productUrl,
+  siteName: "T-kap Fashion",
+  type: "website",
+      images: product.imageUrl
+        ? [
+            {
+              url: product.imageUrl,
+              width: 1200,
+              height: 630,
+            },
+          ]
+        : [],
     },
+
     twitter: {
       card: "summary_large_image",
       title: product.name,
-      description: product.description,
-      images: [product.imageUrl],
+      description,
+      images: product.imageUrl ? [product.imageUrl] : [],
     },
   };
 }
@@ -79,26 +85,59 @@ export default async function ProductPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    image: [product.imageUrl],
+    image: product.imageUrl ? [product.imageUrl] : [],
     description: product.description,
     sku: product.id,
+    category: product.category,
+
     brand: {
       "@type": "Brand",
       name: product.brand || "T-kap Fashion",
     },
+
     offers: {
       "@type": "Offer",
       url: productUrl,
       priceCurrency: "USD",
       price: product.price,
-      availability: "https://schema.org/InStock",
+      availability:
+        product.stock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
+      priceValidUntil: "2026-12-31",
     },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: baseUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.category || "Collection",
+        item: `${baseUrl}/${product.category}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.name,
+        item: productUrl,
+      },
+    ],
   };
 
   return (
     <>
       <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <ClientApp />
     </>
   );

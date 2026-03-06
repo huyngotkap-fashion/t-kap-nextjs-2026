@@ -1,4 +1,5 @@
-
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Language, SiteConfig, User, Product, LandingPage, MenuItem } from '../types';
 import { translations } from '../translations';
@@ -43,7 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
-
+  const router = useRouter();
   const baseCategory = useMemo(() => {
     if (activeCategory.includes(':')) return activeCategory.split(':')[0];
     return activeCategory;
@@ -108,7 +109,7 @@ const Navbar: React.FC<NavbarProps> = ({
     const normalizedQuery = removeAccents(searchQuery);
     return products.filter(p => {
       const nameMatch = removeAccents(p.name).includes(normalizedQuery);
-      const brandMatch = removeAccents(p.brand).includes(normalizedQuery);
+      const brandMatch = removeAccents(p.brand || '').includes(normalizedQuery);
       return nameMatch || brandMatch;
     }).slice(0, 8);
   }, [searchQuery, products]);
@@ -299,7 +300,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-h-[60vh] overflow-y-auto no-scrollbar pb-10">
             {searchResults.map(p => (
               <a key={p.id} href={`/product/${createSlug(p.name)}-${p.id}`} onClick={(e) => handleLinkClick(e, `/product/${createSlug(p.name)}-${p.id}`)} className="group flex gap-6 p-4 hover:bg-zinc-900 transition-all border border-transparent hover:border-zinc-800">
-                <div className="w-24 h-32 bg-zinc-800 overflow-hidden shrink-0"><img src={p.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0" alt="" /></div>
+                <div className="w-24 h-32 bg-zinc-800 overflow-hidden shrink-0"><img src={p.imageUrl || '/placeholder.jpg'} className="w-full h-full object-cover grayscale group-hover:grayscale-0" alt="" /></div>
                 <div className="flex flex-col justify-center">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">{p.brand}</span>
                   <h4 className="text-white text-sm font-black uppercase mb-2 leading-snug">{p.name}</h4>

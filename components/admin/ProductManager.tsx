@@ -49,7 +49,7 @@ const ProductManager: React.FC<ProductManagerProps> = ({
       id: editingProduct?.id || Date.now().toString(),
       name: form.name || 'Untitled',
       brand: form.brand || 'T-KAP',
-      category: form.category || 'Men',
+      category: form.category || 'men',
       subCategory: form.subCategory || 'Classic',
       price: Number(form.price) || 0,
       originalPrice: Number(form.originalPrice) || 0,
@@ -164,6 +164,18 @@ const ProductManager: React.FC<ProductManagerProps> = ({
                 <label className={labelBase}>Tên sản phẩm</label>
                 <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className={inputBase} />
               </div>
+              <div>
+  <label className={labelBase}>Danh mục</label>
+  <select
+  value={form.category || 'men'}
+  onChange={e => setForm({ ...form, category: e.target.value })}
+  className={inputBase}
+>
+  <option value="men">Men Collection</option>
+  <option value="polo-sport">Polo Sport</option>
+  <option value="suits">Bespoke Suits</option>
+</select>
+</div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={labelBase}>Giá Bán (VNĐ)</label><input type="number" value={form.price || 0} onChange={e => setForm({ ...form, price: +e.target.value })} className={inputBase} /></div>
@@ -333,7 +345,7 @@ const ProductManager: React.FC<ProductManagerProps> = ({
     <div className="animate-reveal">
       <div className="flex justify-between items-center mb-12">
         <h3 className="text-3xl font-black uppercase tracking-tight">Quản lý Kho hàng</h3>
-        <button onClick={() => { setEditingProduct(null); setForm({ status: 'active', category: 'Men', pricingType: 'price', media: [] }); setIsEditing(true); }} className="bg-black text-white px-10 py-5 text-[10px] font-black uppercase">+ THÊM MỚI</button>
+        <button onClick={() => { setEditingProduct(null); setForm({ status: 'active', category: 'men', pricingType: 'price', media: [] }); setIsEditing(true); }} className="bg-black text-white px-10 py-5 text-[10px] font-black uppercase">+ THÊM MỚI</button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">

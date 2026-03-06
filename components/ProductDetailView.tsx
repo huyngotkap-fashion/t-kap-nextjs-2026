@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Product, Language, DetailHotspot, ProductMedia } from '../types';
 import { translations } from '../translations';
-import AIStylist from './AIStylist';
 import ProductGrid from './ProductGrid';
 import Product360Viewer from './Product360Viewer';
 
@@ -307,9 +306,31 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               )}
             </div>
 
-            <div className="mt-20 pt-20 border-t border-zinc-100">
-              <AIStylist product={product} language={language} />
-            </div>
+            <div className="mt-16 pt-16 border-t border-zinc-200">
+
+  <div className="border border-zinc-300 p-10 bg-white max-w-xl">
+
+    <h3 className="text-[15px] font-bold tracking-[0.25em] uppercase mb-8">
+      THÔNG TIN SẢN PHẨM
+    </h3>
+
+    <ul className="space-y-4 text-[15px] text-zinc-800 leading-relaxed">
+      <li>✓ Thiết kế áo polo doanh nghiệp cao cấp</li>
+      <li>✓ Chất liệu premium thoáng mát</li>
+      <li>✓ In hoặc thêu logo theo yêu cầu</li>
+      <li>✓ Nhận đơn tối thiểu từ 20 áo</li>
+      <li>✓ Tư vấn thiết kế miễn phí</li>
+    </ul>
+
+    <p className="text-[14px] text-zinc-600 mt-8 leading-7 text-justify">
+      T-KAP chuyên thiết kế và sản xuất áo polo doanh nghiệp cao cấp,
+      đồng phục công ty và đồng phục thương hiệu với chất liệu premium.
+      Phù hợp cho đội ngũ nhân viên, sự kiện và xây dựng hình ảnh doanh nghiệp chuyên nghiệp.
+    </p>
+
+  </div>
+
+</div>
           </div>
         </div>
       </div>

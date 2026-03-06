@@ -4,6 +4,10 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
+interface ClientAppProps {
+  initialCategory?: string;
+  landingSlug?: string;
+}
 import ProductCarousel from '../components/ProductCarousel';
 import ProductGrid from '../components/ProductGrid';
 import Footer from '../components/Footer';
@@ -32,7 +36,9 @@ import { useWishlist } from '../hooks/useWishlist';
 import { useSiteData } from '../hooks/useSiteData';
 import { useNavigation } from '../hooks/useNavigation';
 
-const ClientApp: React.FC = () => {
+
+
+const ClientApp: React.FC<ClientAppProps> = ({ initialCategory, landingSlug }) => {
   const [language, setLanguage] = useState<Language>('vi');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -43,7 +49,12 @@ const ClientApp: React.FC = () => {
   const { products, blogs, quotations, landingPages, siteConfig, isConfigLoaded } = useSiteData();
   const { cart, addToCart, removeFromCart, clearCart, cartCount, cartTotal } = useCart();
   const { wishlist, toggleWishlist, wishlistProducts } = useWishlist(products);
-  const { navigate, routeInfo, matchedLandingPage, matchedHiddenLink, activeCategory } = useNavigation(landingPages, siteConfig);
+  const { navigate, routeInfo, matchedLandingPage, matchedHiddenLink, activeCategory } =
+useNavigation(
+  landingPages,
+  siteConfig,
+  landingSlug || initialCategory
+);
 
   const handleWishlistToCartAction = (p: Product) => {
     addToCart(p);
@@ -68,9 +79,9 @@ const ClientApp: React.FC = () => {
       );
     }
 
-    if (activeCategory === 'Landing' && matchedLandingPage) {
-      return <LandingPageRenderer page={matchedLandingPage} language={language} />;
-    }
+    if ((activeCategory === 'Landing' || matchedLandingPage) && matchedLandingPage) {
+  return <LandingPageRenderer page={matchedLandingPage} language={language} />;
+}
 
     if (activeCategory === 'Admin') {
       return user?.role === 'admin' ? (
@@ -87,20 +98,32 @@ const ClientApp: React.FC = () => {
       ) : <div className="h-[60vh] flex items-center justify-center font-bold uppercase tracking-widest">Access Denied</div>;
     }
 
-    if (activeCategory === 'Product' && routeInfo.id) {
-      const product = products.find(p => p.id === routeInfo.id);
+    if (activeCategory === 'Product' && routeInfo.type === 'product') {
+  const product = products.find(p => p.id === routeInfo.id);
       if (!product) return <div className="h-[60vh] flex items-center justify-center">Product not found</div>;
       return <ProductDetailView product={product} allProducts={products} language={language} onAddToCart={(prod, sz) => { addToCart(prod, sz); setIsCartOpen(true); }} wishlist={wishlist} onToggleWishlist={toggleWishlist} />;
     }
 
     if (activeCategory === 'Blog') {
-      return (
-        <>
-          {!routeInfo.id && <Hero language={language} config={siteConfig} activeCategory="Blog" onAction={navigate} />}
-          <BlogSection language={language} blogs={blogs} activeBlogId={routeInfo.type === 'blog' ? routeInfo.id || null : null} />
-        </>
-      );
-    }
+  return (
+    <>
+      {routeInfo.type !== 'blog' && (
+        <Hero
+          language={language}
+          config={siteConfig}
+          activeCategory="Blog"
+          onAction={navigate}
+        />
+      )}
+
+      <BlogSection
+        language={language}
+        blogs={blogs}
+        activeBlogId={routeInfo.type === 'blog' ? routeInfo.id : null}
+      />
+    </>
+  );
+}
 
     if (activeCategory === 'Stores') {
       return <StoreLocator language={language} config={siteConfig.storesPage} />;
@@ -114,21 +137,78 @@ const ClientApp: React.FC = () => {
       return user ? <OrderHistory user={user} language={language} products={products} /> : <div className="h-[60vh] flex items-center justify-center">Please log in to view history</div>;
     }
 
-    if (activeCategory === 'Men' || activeCategory === 'Women') {
-      const filtered = products.filter(p => p.category === activeCategory);
-      return (
-        <>
-          <Hero language={language} config={siteConfig} activeCategory={activeCategory} onAction={navigate} />
-          <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-20">
-            <div className="mb-16">
-              <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">{activeCategory}</h1>
-              <p className="text-zinc-400 mt-4 uppercase tracking-[0.3em] font-bold">Discover the Signature {activeCategory} Collection</p>
-            </div>
-            <ProductGrid products={filtered} wishlist={wishlist} onToggleWishlist={toggleWishlist} />
-          </div>
-        </>
-      );
-    }
+    if (activeCategory === 'men' || activeCategory === 'polo-sport') {
+
+  const filtered = products.filter(
+    p => p.category.toLowerCase() === activeCategory
+  );
+
+  return (
+    <>
+      <Hero
+        language={language}
+        config={siteConfig}
+        activeCategory={activeCategory}
+        onAction={navigate}
+      />
+
+      {/* SEO CONTENT */}
+      <section className="max-w-[1200px] mx-auto px-6 md:px-12 py-16">
+
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-10">
+          Áo Polo Cao Cấp & Đồng Phục Doanh Nghiệp
+        </h1>
+
+        <div className="grid md:grid-cols-2 gap-10 text-gray-600 leading-7 text-justify text-[15px]">
+
+          <p>
+            <strong>T-Kap Fashion</strong> chuyên thiết kế và sản xuất 
+            <strong> áo polo cao cấp</strong> và 
+            <strong> đồng phục doanh nghiệp</strong> dành cho các thương hiệu hiện đại. 
+            Sản phẩm được sản xuất từ chất liệu premium, form chuẩn và thiết kế 
+            sang trọng phù hợp với môi trường doanh nghiệp, khách sạn, resort 
+            và các thương hiệu cao cấp.
+          </p>
+
+          <p>
+            Chúng tôi cung cấp dịch vụ <strong>thiết kế polo theo yêu cầu</strong>, 
+            <strong> corporate uniform</strong> và 
+            <strong> luxury company apparel</strong> giúp doanh nghiệp xây dựng 
+            hình ảnh thương hiệu chuyên nghiệp, đồng bộ và đẳng cấp.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      {/* PRODUCT SECTION */}
+
+      <section className="max-w-[1800px] mx-auto px-6 md:px-12 pb-20">
+
+        <div className="mb-16 text-center">
+
+          <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">
+{title}
+</h2>
+
+<p className="text-zinc-400 mt-4 uppercase tracking-[0.3em] font-bold">
+{subtitle}
+</p>
+
+        </div>
+
+        <ProductGrid
+          products={filtered}
+          wishlist={wishlist}
+          onToggleWishlist={toggleWishlist}
+        />
+
+      </section>
+
+    </>
+  );
+}
 
     return (
       <>
@@ -157,6 +237,18 @@ const ClientApp: React.FC = () => {
       </>
     );
   };
+  const titleMap: any = {
+  men: "ÁO POLO NAM CAO CẤP",
+  "polo-sport": "POLO SPORT"
+};
+
+const subtitleMap: any = {
+  men: "Đồng phục doanh nghiệp & áo polo cao cấp",
+  "polo-sport": "Discover the Signature Polo Sport Collection"
+};
+
+const title = titleMap[activeCategory];
+const subtitle = subtitleMap[activeCategory];
 
   return (
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">

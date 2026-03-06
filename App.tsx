@@ -44,10 +44,13 @@ const App: React.FC = () => {
   const { wishlist, toggleWishlist, wishlistProducts } = useWishlist(products);
   const { navigate, routeInfo, matchedLandingPage, matchedHiddenLink, activeCategory } = useNavigation(landingPages, siteConfig);
 
-  useSeo({ 
-    title: activeCategory === 'Product' ? products.find(p => p.id === routeInfo.id)?.name : (matchedLandingPage?.title || matchedHiddenLink?.title), 
-    lang: language 
-  });
+  useSeo({
+  title:
+  routeInfo.type === 'product' && routeInfo.id
+    ? products.find(p => p.id === routeInfo.id)?.name
+    : matchedLandingPage?.title || matchedHiddenLink?.title,
+  lang: language
+});
 
   const handleWishlistToCartAction = (p: Product) => {
     addToCart(p);
@@ -91,8 +94,8 @@ const App: React.FC = () => {
       ) : <div className="h-[60vh] flex items-center justify-center font-bold uppercase tracking-widest">Access Denied</div>;
     }
 
-    if (activeCategory === 'Product' && routeInfo.id) {
-      const product = products.find(p => p.id === routeInfo.id);
+    if (routeInfo.type === 'product') {
+  const product = products.find(p => p.id === routeInfo.id);
       if (!product) return <div className="h-[60vh] flex items-center justify-center">Product not found</div>;
       return <ProductDetailView product={product} allProducts={products} language={language} onAddToCart={(prod, sz) => { addToCart(prod, sz); setIsCartOpen(true); }} wishlist={wishlist} onToggleWishlist={toggleWishlist} />;
     }
@@ -100,8 +103,23 @@ const App: React.FC = () => {
     if (activeCategory === 'Blog') {
       return (
         <>
-          {!routeInfo.id && <Hero language={language} config={siteConfig} activeCategory="Blog" onAction={navigate} />}
-          <BlogSection language={language} blogs={blogs} activeBlogId={routeInfo.type === 'blog' ? routeInfo.id || null : null} />
+          {routeInfo.type !== 'blog' && (
+  <Hero 
+    language={language} 
+    config={siteConfig} 
+    activeCategory="Blog" 
+    onAction={navigate} 
+  />
+)}
+          <BlogSection
+  language={language}
+  blogs={blogs}
+  activeBlogId={
+    routeInfo.type === 'blog'
+      ? routeInfo.id
+      : null
+  }
+/>
         </>
       );
     }
@@ -118,7 +136,7 @@ const App: React.FC = () => {
       return user ? <OrderHistory user={user} language={language} products={products} /> : <div className="h-[60vh] flex items-center justify-center">Please log in to view history</div>;
     }
 
-    if (activeCategory === 'Men' || activeCategory === 'Women') {
+    if (activeCategory === 'Men' || activeCategory === 'polo-sport') {
       const filtered = products.filter(p => p.category === activeCategory);
       return (
         <>

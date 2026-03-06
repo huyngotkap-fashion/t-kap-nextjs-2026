@@ -1,19 +1,20 @@
 
 export const en = {
   nav: {
-    sale: "COLLECTION",
-    newIn: "New In",
-    men: "Men",
-    women: "Women",
-    bespoke: "Heritage",
-    stores: "Stores",
-    admin: "Admin",
-    allBrands: "TKAP GLOBAL",
-    login: "Log In",
-    logout: "Log Out",
-    account: "Account"
-  },
-  common: {
+  sale: "COLLECTION",
+  newIn: "New In",
+  men: "Men",
+  women: "Women",   // thêm dòng này
+  poloSport: "Polo Sport",
+  bespoke: "Heritage",
+  stores: "Stores",
+  admin: "Admin",
+  allBrands: "TKAP GLOBAL",
+  login: "Log In",
+  logout: "Log Out",
+account: "Account"
+},
+common: {
     filter: "Filter",
     sort: "Sort",
     sizeGuide: "What's my size?",

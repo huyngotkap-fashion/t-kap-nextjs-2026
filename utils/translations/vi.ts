@@ -1,19 +1,20 @@
 
 export const vi = {
   nav: {
-    sale: "BỘ SƯU TẬP",
-    newIn: "Mới Về",
-    men: "Nam",
-    women: "Nữ",
-    bespoke: "Di Sản",
-    stores: "Cửa Hàng",
-    admin: "Quản Trị",
-    allBrands: "TKAP TOÀN CẦU",
-    login: "Đăng Nhập",
-    logout: "Đăng Xuất",
-    account: "Tài Khoản"
-  },
-  common: {
+  sale: "BỘ SƯU TẬP",
+  newIn: "Mới Về",
+  men: "Nam",
+  poloSport: "Polo Sport",   // thêm dòng này
+  bespoke: "Di Sản",
+  stores: "Cửa Hàng",
+  admin: "Quản Trị",
+  allBrands: "TKAP TOÀN CẦU",
+  login: "Đăng Nhập",
+  logout: "Đăng Xuất",
+account: "Tài Khoản"
+},   // thêm dấu phẩy ở đây
+
+common: {
     filter: "Bộ lọc",
     sort: "Sắp xếp",
     sizeGuide: "Hướng dẫn chọn size",

@@ -59,7 +59,7 @@ const Footer: React.FC<FooterProps> = ({ language, config, onNavigate }) => {
               <li><a href="/" onClick={(e) => handleLinkClick(e, '/')} className="hover:text-white transition-colors">Introduction</a></li>
               <li><a href="/stores" onClick={(e) => handleLinkClick(e, '/stores')} className="hover:text-white transition-colors">Stores</a></li>
               <li><a href="/men" onClick={(e) => handleLinkClick(e, '/men')} className="hover:text-white transition-colors">Men&apos;s Collection</a></li>
-              <li><a href="/women" onClick={(e) => handleLinkClick(e, '/women')} className="hover:text-white transition-colors">Women&apos;s Collection</a></li>
+              <li><a href="/polo-sport" onClick={(e) => handleLinkClick(e, '/polo-sport')} className="hover:text-white transition-colors">Women&apos;s Collection</a></li>
             </ul>
           </div>
 

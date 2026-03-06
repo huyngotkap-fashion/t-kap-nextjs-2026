@@ -2,9 +2,9 @@ import { MetadataRoute } from "next";
 import { getCollectionOnce } from "@/services/firestoreService";
 
 function slugify(text: any) {
-  if (!text || typeof text !== "string") return "";
+  if (!text) return "item";
 
-  return text
+  return String(text)
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -14,67 +14,62 @@ function slugify(text: any) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.APP_URL || "https://t-kap.com.vn";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://t-kap.com.vn";
 
   const products = await getCollectionOnce("products");
   const blogs = await getCollectionOnce("blogs");
 
-  // ✅ Product URLs
-  const productEntries: MetadataRoute.Sitemap = products
-    .filter((p: any) => typeof p.name === "string")
-    .map((p: any) => ({
-      url: `${baseUrl}/product/${slugify(p.name)}-${p.id}`,
-      lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    }));
+  const productEntries = products
+  .filter((p: any) => p?.id && p?.name)
+  .map((p: any) => ({
+    url: `${baseUrl}/product/${slugify(p.name)}-${p.id}`,
+    lastModified: p.updatedAt?.toDate?.() || new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
-  // ✅ Blog URLs
-  const blogEntries: MetadataRoute.Sitemap = blogs
-    .filter((b: any) => typeof b.title === "string")
-    .map((b: any) => ({
-      url: `${baseUrl}/blog/${slugify(b.title)}-${b.id}`,
-      lastModified: b.updatedAt ? new Date(b.updatedAt) : new Date(),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    }));
+  const blogEntries = blogs.map((b: any) => ({
+    url: `${baseUrl}/blog/${slugify(b.title)}-${String(b.id)}`,
+    lastModified: b.updatedAt?.toDate?.() || new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
 
-  // ✅ Static pages
-  const staticPages: MetadataRoute.Sitemap = [
+  const staticPages = [
     {
-      url: `${baseUrl}`,
+      url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 1,
     },
     {
       url: `${baseUrl}/men`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/women`,
+      url: `${baseUrl}/polo-sport`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.9,
     },
     {
       url: `${baseUrl}/journal`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.8,
     },
     {
       url: `${baseUrl}/stores`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.7,
     },
     {
       url: `${baseUrl}/quotation`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.6,
     },
   ];

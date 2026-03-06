@@ -1,3 +1,4 @@
+"use client";
 
 import React, { useState, useRef } from 'react';
 import { Product } from '../types';
@@ -129,21 +130,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
             {product.name}
           </h3>
           <div className="flex flex-col gap-0.5">
-            {product.pricingType === 'quotation' ? (
-              <span className="text-[12px] font-bold text-zinc-900 uppercase tracking-tighter">Báo giá</span>
-            ) : (
-              <>
-                <p className="text-[13px] font-black text-zinc-900 tracking-tighter transition-transform duration-300 group-hover:translate-x-1 origin-left">
-                  {formatPrice(product.price)}
-                </p>
-                {product.originalPrice && product.originalPrice > product.price && (
-                  <p className="text-[11px] text-zinc-400 line-through tracking-tighter">
-                    {formatPrice(product.originalPrice)}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
+  {product.pricingType === 'price' && (
+    <>
+      <p className="text-[13px] font-black text-zinc-900 tracking-tighter transition-transform duration-300 group-hover:translate-x-1 origin-left">
+        {formatPrice(product.price)}
+      </p>
+
+      {product.originalPrice && product.originalPrice > product.price && (
+        <p className="text-[11px] text-zinc-400 line-through tracking-tighter">
+          {formatPrice(product.originalPrice)}
+        </p>
+      )}
+    </>
+  )}
+</div>
+<div className="opacity-0 group-hover:opacity-100 transition-all duration-500 pt-2">
+  <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">
+    Xem chi tiết
+  </span>
+</div>
           {product.colors && product.colors.length > 0 && (
             <div className="flex gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
               {product.colors.slice(0, 4).map((color, idx) => (
@@ -163,11 +168,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
 
 interface ProductGridProps {
   products: Product[];
-  wishlist: string[];
-  onToggleWishlist: (id: string) => void;
+  wishlist?: string[];
+  onToggleWishlist?: (id: string) => void;
   isLoading?: boolean;
 }
-
 const ProductGrid: React.FC<ProductGridProps> = ({ products, wishlist, onToggleWishlist, isLoading }) => {
   if (isLoading) {
     return (
@@ -185,8 +189,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, wishlist, onToggleW
             key={product.id}
             product={product}
             index={index}
-            isWished={wishlist.includes(product.id)}
-            onToggleWishlist={onToggleWishlist}
+            isWished={wishlist?.includes(product.id) ?? false}
+            onToggleWishlist={onToggleWishlist ?? (() => {})}
           />
         ))}
     </div>
