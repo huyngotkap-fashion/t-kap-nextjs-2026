@@ -198,7 +198,7 @@ href="/"
 onClick={(e) => handleLinkClick(e, "/")}
 className="absolute left-1/2 -translate-x-1/2 xl:relative xl:left-0 xl:translate-x-0"
 >
-<img src={config.logoImageUrl} className="h-8 md:h-12" />
+<img src={config.logoImageUrl} alt="T-KAP Logo" className="h-8 md:h-12" />
 </a>
         {isMobileMenuOpen && (
 
@@ -558,7 +558,7 @@ className="relative"
                   )
                 }
               >
-                <img src={p.imageUrl} />
+                <img src={p.imageUrl} alt={p.name} />
                 <p>{p.name}</p>
               </a>
             ))}

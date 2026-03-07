@@ -1,4 +1,4 @@
-
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from 'react';
 import { Product, Language, DetailHotspot, ProductMedia } from '../types';
 import { translations } from '../translations';
@@ -16,14 +16,15 @@ const formatPrice = (price: number) => {
 
 const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot, language }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const isNearLeft = hotspot.x < 25;
   const isNearRight = hotspot.x > 75;
   const isNearTop = hotspot.y < 35;
 
   const getTooltipPositionClasses = () => {
-    let classes = "absolute z-40 w-64 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.3)] border border-zinc-100 p-0 transition-all duration-500 ";
-    
+    let classes =
+      "absolute z-40 w-64 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.3)] border border-zinc-100 p-0 transition-all duration-500 ";
+
     if (isNearTop) {
       classes += "top-full mt-4 origin-top ";
     } else {
@@ -41,7 +42,9 @@ const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot, language }) => {
     if (isOpen) {
       classes += "opacity-100 scale-100 translate-y-0";
     } else {
-      classes += `opacity-0 scale-90 ${isNearTop ? '-translate-y-4' : 'translate-y-4'} pointer-events-none`;
+      classes += `opacity-0 scale-90 ${
+        isNearTop ? "-translate-y-4" : "translate-y-4"
+      } pointer-events-none`;
     }
 
     return classes;
@@ -49,7 +52,7 @@ const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot, language }) => {
 
   const getArrowClasses = () => {
     let classes = "absolute border-8 border-transparent ";
-    
+
     if (isNearTop) {
       classes += "bottom-full border-b-white ";
     } else {
@@ -66,10 +69,10 @@ const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot, language }) => {
 
     return classes;
   };
-  
+
   return (
-    <div 
-      className="absolute z-30" 
+    <div
+      className="absolute z-30"
       style={{ top: `${hotspot.y}%`, left: `${hotspot.x}%` }}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
@@ -85,20 +88,23 @@ const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot, language }) => {
         {hotspot.imageUrl && (
           <div className="aspect-video overflow-hidden bg-zinc-100">
             <img
-  src={hotspot.imageUrl}
-  className="w-full h-full object-cover"
-  alt={hotspot.title[language] || hotspot.title['vi']}
-/>
+              src={hotspot.imageUrl}
+              className="w-full h-full object-cover"
+              alt={hotspot.title[language] || hotspot.title["vi"]}
+            />
           </div>
         )}
+
         <div className="p-5 space-y-2">
           <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-900 border-b border-zinc-50 pb-2">
-            {hotspot.title[language] || hotspot.title['vi']}
+            {hotspot.title[language] || hotspot.title["vi"]}
           </h4>
+
           <p className="text-[11px] text-zinc-500 font-medium leading-relaxed italic">
-            {hotspot.description[language] || hotspot.description['vi']}
+            {hotspot.description[language] || hotspot.description["vi"]}
           </p>
         </div>
+
         <div className={getArrowClasses()}></div>
       </div>
     </div>
@@ -117,6 +123,7 @@ interface ProductDetailViewProps {
 const ProductDetailView: React.FC<ProductDetailViewProps> = ({ 
   product, allProducts, language, onAddToCart, wishlist, onToggleWishlist 
 }) => {
+  const router = useRouter();
   const [activeMediaIdx, setActiveMediaIdx] = useState(0);
   const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.[0] || null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -148,11 +155,19 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   return (
     <div className="bg-white min-h-screen animate-fade-in">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-10 border-b border-zinc-100 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-black transition-all group">
-          <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-          {language === 'vi' ? 'QUAY LẠI' : 'BACK'}
-        </a>
-      </div>
+
+<button
+  onClick={() => window.history.back()}
+  className="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-black transition-all group"
+>
+  <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+  {language === 'vi' ? 'QUAY LẠI' : 'BACK'}
+</button>
+
+ 
+        </div>
 
       <div className="max-w-[1800px] mx-auto flex flex-col lg:flex-row min-h-[calc(100vh-170px)]">
         <div className="w-full lg:w-[65%] bg-zinc-50 flex flex-col h-auto lg:h-full lg:sticky lg:top-[170px] border-r border-zinc-100 relative">

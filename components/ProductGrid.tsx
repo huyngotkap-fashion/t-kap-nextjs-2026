@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import React, { useState, useRef } from 'react';
 import { Product } from '../types';
 
@@ -81,7 +81,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
         </svg>
       </button>
 
-      <a href={productPath}>
+      <Link href={productPath} prefetch>
         <div 
           ref={containerRef}
           onMouseMove={handleMouseMove}
@@ -155,13 +155,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
                 <div 
                   key={idx}
                   className="w-3.5 h-3.5 rounded-full border border-zinc-300 shadow-inner"
-                  style={{ backgroundColor: color.startsWith('#') ? color : '#ccc' }}
+                  style={{ backgroundColor: color }}
                 />
               ))}
             </div>
           )}
         </div>
-      </a>
+      </Link>
     </div>
   );
 };
