@@ -7,6 +7,7 @@ import {
   deleteDoc, 
   getDocs, 
   getDoc,
+  addDoc,
   query, 
   DocumentData,
   QuerySnapshot
@@ -104,4 +105,32 @@ export const removeDocument = async (collectionName: string, docId: string) => {
     console.error("Error deleting document:", error);
     throw error;
   }
+};
+export const addDocument = async (collectionName: string, data: any) => {
+  try {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document:", error);
+    throw error;
+  }
+};
+export const getCollection = async (name: string) => {
+  const snapshot = await getDocs(collection(db, name));
+
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+};
+export const getDocument = async (collectionName: string, id: string) => {
+  const ref = doc(db, collectionName, id);
+  const snapshot = await getDoc(ref);
+
+  if (!snapshot.exists()) return null;
+
+  return {
+    id: snapshot.id,
+    ...snapshot.data(),
+  };
 };

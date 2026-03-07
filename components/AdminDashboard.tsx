@@ -15,6 +15,7 @@ import HomepageContentManager from './admin/HomepageContentManager';
 import StoreContactManager from './admin/StoreContactManager';
 import SystemSettingsManager from './admin/SystemSettingsManager';
 import LandingPageManager from './admin/LandingPageManager';
+import CategoryManager from './admin/CategoryManager';
 
 interface AdminDashboardProps {
   products: Product[];
@@ -30,7 +31,17 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   products, blogs, quotations, landingPages, siteConfig, language, onUpdateSiteConfig, user
 }) => {
-  type TabType = 'products' | 'blogs' | 'quotations' | 'nav' | 'banners' | 'homepage' | 'stores' | 'settings' | 'landings';
+  type TabType =
+  'products' |
+  'blogs' |
+  'quotations' |
+  'categories' |
+  'nav' |
+  'banners' |
+  'homepage' |
+  'stores' |
+  'settings' |
+  'landings';
   const [activeTab, setActiveTab] = useState<TabType>('products');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -54,6 +65,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const getTabTitle = (id: TabType) => {
     switch(id) {
+      case 'categories': return 'Quản lý Danh mục';
       case 'products': return 'Kho Sản Phẩm';
       case 'blogs': return 'Tạp chí & Bài viết';
       case 'quotations': return 'Yêu cầu Báo giá';
@@ -98,6 +110,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <button onClick={() => toggleTab('products')} className={navItemClass('products')}>📦 Sản phẩm</button>
           <button onClick={() => toggleTab('blogs')} className={navItemClass('blogs')}>🖋️ Tạp chí</button>
           <button onClick={() => toggleTab('quotations')} className={navItemClass('quotations')}>📜 Báo giá</button>
+          <button onClick={() => toggleTab('categories')} className={navItemClass('categories')}>
+📂 Danh mục
+</button>
           
           <div className="px-10 mt-8 mb-4 text-[8px] font-bold text-zinc-300 uppercase tracking-[0.3em]">Giao diện & Trải nghiệm</div>
           <button onClick={() => toggleTab('nav')} className={navItemClass('nav')}>🧭 Điều hướng</button>
@@ -137,7 +152,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </header>
 
           <div className="max-w-[1500px]">
+
+            {activeTab === 'categories' && (
+  <CategoryManager />
+)}
+
             {activeTab === 'products' && (
+            
               <ProductManager 
                 products={products}
                 onAddProduct={p => upsertDocument('products', p.id, p)}

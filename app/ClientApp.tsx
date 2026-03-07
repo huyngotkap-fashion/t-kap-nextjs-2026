@@ -35,6 +35,7 @@ import { useCart } from '../hooks/useCart';
 import { useWishlist } from '../hooks/useWishlist';
 import { useSiteData } from '../hooks/useSiteData';
 import { useNavigation } from '../hooks/useNavigation';
+import { usePathname } from "next/navigation";
 
 
 
@@ -49,11 +50,13 @@ const ClientApp: React.FC<ClientAppProps> = ({ initialCategory, landingSlug }) =
   const { products, blogs, quotations, landingPages, siteConfig, isConfigLoaded } = useSiteData();
   const { cart, addToCart, removeFromCart, clearCart, cartCount, cartTotal } = useCart();
   const { wishlist, toggleWishlist, wishlistProducts } = useWishlist(products);
+  const pathname = usePathname();
+  const slug = pathname.replace(/^\/+/, "");
   const { navigate, routeInfo, matchedLandingPage, matchedHiddenLink, activeCategory } =
 useNavigation(
   landingPages,
   siteConfig,
-  landingSlug || initialCategory
+  slug
 );
 
   const handleWishlistToCartAction = (p: Product) => {
@@ -137,11 +140,31 @@ useNavigation(
       return user ? <OrderHistory user={user} language={language} products={products} /> : <div className="h-[60vh] flex items-center justify-center">Please log in to view history</div>;
     }
 
-    if (activeCategory === 'men' || activeCategory === 'polo-sport') {
+    if (activeCategory) {
 
-  const filtered = products.filter(
-    p => p.category.toLowerCase() === activeCategory
-  );
+  const normalize = (str: string) =>
+  str
+    ?.toLowerCase()
+    .replace(/đ/g, "d")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-");
+
+const filtered = products.filter(p => {
+  const category = normalize(p.category || "");
+  const sub = normalize(p.subCategory || "");
+
+  const slugParts = slug?.split("/") || [];
+
+  const urlCategory = slugParts[0];
+  const urlSub = slugParts[1];
+
+  if (urlSub) {
+    return category === urlCategory && sub === urlSub;
+  }
+
+  return category === urlCategory;
+});
 
   return (
     <>
@@ -155,9 +178,9 @@ useNavigation(
       {/* SEO CONTENT */}
       <section className="max-w-[1200px] mx-auto px-6 md:px-12 py-16">
 
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-10">
-          Áo Polo Cao Cấp & Đồng Phục Doanh Nghiệp
-        </h1>
+        <h1 className="text-sm font-bold tracking-[0.3em] uppercase mb-8">
+T-KAP FASHION
+</h1>
 
         <div className="grid md:grid-cols-2 gap-10 text-gray-600 leading-7 text-justify text-[15px]">
 
@@ -239,7 +262,9 @@ useNavigation(
   };
   const titleMap: any = {
   men: "ÁO POLO NAM CAO CẤP",
-  "polo-sport": "POLO SPORT"
+  "polo-sport": "POLO SPORT",
+  "pickleball": "POLO PICKLEBALL",
+  "golf": "GOLF"
 };
 
 const subtitleMap: any = {
@@ -247,8 +272,8 @@ const subtitleMap: any = {
   "polo-sport": "Discover the Signature Polo Sport Collection"
 };
 
-const title = titleMap[activeCategory];
-const subtitle = subtitleMap[activeCategory];
+const title = titleMap[slug] || titleMap[activeCategory];
+const subtitle = subtitleMap[slug] || subtitleMap[activeCategory];
 
   return (
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">

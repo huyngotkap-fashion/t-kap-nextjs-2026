@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Product, ProductMedia, DetailHotspot } from '../../types';
 import RichTextEditor from './RichTextEditor';
+import { getCollectionOnce } from "../../services/firebaseService";
 
 interface ProductManagerProps {
   products: Product[];
@@ -23,6 +24,8 @@ const ProductManager: React.FC<ProductManagerProps> = ({
   const [hotspotEditorMediaIdx, setHotspotEditorMediaIdx] = useState<number | null>(null);
   const descRef = useRef<HTMLDivElement>(null);
   const colorPickerRef = useRef<HTMLInputElement>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  
 
   useEffect(() => {
     if (editingProduct) {
@@ -31,9 +34,22 @@ const ProductManager: React.FC<ProductManagerProps> = ({
       setBatch360Text("");
     }
   }, [editingProduct]);
+  useEffect(() => {
+  const loadCategories = async () => {
+    const data = await getCollectionOnce("categories");
+    setCategories(data);
+  };
+
+  loadCategories();
+}, []);
 
   const inputBase = 'w-full bg-white border border-zinc-200 px-5 py-3 text-sm outline-none focus:border-black transition-all';
   const labelBase = 'text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2 block';
+  const parentCategories = categories.filter(c => !c.parentId);
+
+const childCategories = categories.filter(
+  c => c.parentId === form.category
+);
 
   const handleSave = () => {
     const html = descRef.current?.innerHTML || '';
@@ -176,16 +192,39 @@ const ProductManager: React.FC<ProductManagerProps> = ({
               <div>
   <label className={labelBase}>Danh mục</label>
   <select
-  value={form.category || 'men'}
-  onChange={e => setForm({ ...form, category: e.target.value })}
-  className={inputBase}
+value={form.category || ""}
+onChange={(e) =>
+  setForm({ ...form, category: e.target.value, subCategory: "" })
+}
+className={inputBase}
 >
-  <option value="men">Men Collection</option>
-  <option value="polo-sport">Polo Sport</option>
-  <option value="suits">Bespoke Suits</option>
+<option value="">Chọn danh mục</option>
+
+{parentCategories.map((cat) => (
+  <option key={cat.id} value={cat.id}>
+    {cat.name}
+  </option>
+))}
 </select>
 </div>
 
+              <div>
+  <label className={labelBase}>Danh mục con</label>
+
+  <select
+value={form.subCategory || ""}
+onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
+className={inputBase}
+>
+<option value="">Chọn danh mục con</option>
+
+{childCategories.map((cat) => (
+  <option key={cat.id} value={cat.id}>
+    {cat.name}
+  </option>
+))}
+</select>
+</div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={labelBase}>Giá Bán (VNĐ)</label><input type="number" value={form.price || 0} onChange={e => setForm({ ...form, price: +e.target.value })} className={inputBase} /></div>
                 <div><label className={labelBase}>Giá Gốc (VNĐ)</label><input type="number" value={form.originalPrice || 0} onChange={e => setForm({ ...form, originalPrice: +e.target.value })} className={inputBase} /></div>

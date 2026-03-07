@@ -59,9 +59,21 @@ export const useNavigation = (
       return { type: 'blog', id };
     }
 
-    const slug = path.replace('/', '') || 'all';
+    const parts = path.split('/').filter(Boolean);
 
-    return { type: 'page', slug };
+if (parts.length === 0) {
+  return { type: 'page', slug: 'all' };
+}
+
+if (parts.length === 1) {
+  return { type: 'page', slug: parts[0] };
+}
+
+if (parts.length >= 2) {
+  return { type: 'page', slug: `${parts[0]}/${parts[1]}` };
+}
+
+return { type: 'page', slug: 'all' };
   }, [currentPath]);
 
   const matchedLandingPage = useMemo(() => {
@@ -92,17 +104,22 @@ export const useNavigation = (
     if (routeInfo.type === 'blog') return 'Blog';
 
     if (routeInfo.type === 'page') {
-      const s = routeInfo.slug;
+  const parts = routeInfo.slug.split('/');
 
-      if (s === 'men') return 'men';
-      if (s === 'polo-sport') return 'polo-sport';
-      if (s === 'journal' || s === 'blog') return 'Blog';
-      if (s === 'stores') return 'Stores';
-      if (s === 'quotation') return 'Quotation';
-      if (s === 'checkout') return 'Checkout';
-      if (s === 'history') return 'History';
-      if (s === 'admin') return 'Admin';
-    }
+  const category = parts[0];
+  const subcategory = parts[1];
+
+  if (subcategory) return subcategory;
+
+  if (category === 'men') return 'men';
+  if (category === 'polo-sport') return 'polo-sport';
+  if (category === 'journal' || category === 'blog') return 'Blog';
+  if (category === 'stores') return 'Stores';
+  if (category === 'quotation') return 'Quotation';
+  if (category === 'checkout') return 'Checkout';
+  if (category === 'history') return 'History';
+  if (category === 'admin') return 'Admin';
+}
 
     return 'All';
   }, [routeInfo, matchedLandingPage, matchedHiddenLink]);
