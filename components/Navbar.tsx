@@ -97,8 +97,10 @@ const Navbar: React.FC<NavbarProps> = ({
       getUrlPath(item.targetCategory).toLowerCase()
     );
 
-  const isBrandActive = (target: string) =>
-    normalize(target) === normalize(baseCategory);
+  const isBrandActive = (target: string) => {
+  const path = getUrlPath(target);
+  return pathname.startsWith(path);
+};
 
   const handleLinkClick = (e: React.MouseEvent, path: string) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
@@ -249,7 +251,7 @@ active
 {filteredNavItems.map((link) => {
 
 const path = getUrlPath(link.targetCategory);
-
+const active = isLinkActive(link);
 const isPolo =
 normalize(link.targetCategory) === "polo-sport" ||
 normalize(link.targetCategory) === "polo-the-thao";
@@ -261,7 +263,11 @@ return (
 <a
 href={path}
 onClick={(e) => handleLinkClick(e, path)}
-className="text-zinc-400 hover:text-white"
+className={`${
+active
+? "text-white"
+: "text-zinc-400 hover:text-white"
+}`}
 >
 
 {link.label[language]}
@@ -282,7 +288,11 @@ href={`/${cat.fullSlug}`}
 onClick={(e) =>
 handleLinkClick(e, `/${cat.fullSlug}`)
 }
-className="text-lg text-zinc-500 hover:text-white uppercase"
+className={`text-lg uppercase ${
+pathname.startsWith(`/${cat.fullSlug}`)
+? "text-white"
+: "text-zinc-500 hover:text-white"
+}`}
 >
 
 {cat.name}
@@ -364,51 +374,56 @@ TIẾNG VIỆT
         </div>
 
         {/* MENU */}
-        <div className="hidden xl:flex gap-10">
+        <div className="hidden xl:flex items-center gap-12 text-[11px] tracking-[0.25em] uppercase font-semibold">
 
           {filteredNavItems.map((link) => {
-            const path = getUrlPath(link.targetCategory);
-            const active = isLinkActive(link);
-            const isPolo =
-  normalize(link.targetCategory) === "polo-sport" ||
-  normalize(link.targetCategory) === "polo-the-thao";
 
-            return (
-              <div key={link.id} className="relative group">
+const path = getUrlPath(link.targetCategory);
+const active = isLinkActive(link);   // thêm dòng này
 
-                <a
-                  href={path}
-                  onClick={(e) => handleLinkClick(e, path)}
-                  className={`relative text-[10px] font-bold uppercase tracking-[0.2em] py-2 ${
-                    active
-                      ? "text-white"
-                      : "text-zinc-500 hover:text-white"
-                  }`}
-                >
-                  {link.label[language] || link.label.vi}
+const isPolo =
+normalize(link.targetCategory) === "polo-sport" ||
+normalize(link.targetCategory) === "polo-the-thao";
 
-                  <span
-                    className={`absolute left-0 -bottom-1 h-[2px] bg-white transition-all ${
-                      active ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </a>
+return (
+
+<div key={link.id} className="relative group">
+
+<a
+href={path}
+onClick={(e) => handleLinkClick(e, path)}
+className={`relative pb-1 ${
+active
+? "text-white"
+: "text-zinc-400 hover:text-white"
+}`}
+>
+
+{(link.label[language] || link.label.vi).toUpperCase()}
+
+<span
+className={`absolute left-0 -bottom-1 h-[2px] bg-white transition-all ${
+active ? "w-full" : "w-0 group-hover:w-full"
+}`}
+ />
+
+</a>
 
                 {isPolo && poloCategories.length > 0 && (
-                  <div className="absolute top-full left-0 bg-black border border-zinc-800 hidden group-hover:block min-w-[200px]">
-                    {poloCategories.map((cat) => (
-                      <a
-                        key={cat.id}
-                        href={`/${cat.fullSlug}`}
-                        onClick={(e) =>
-                          handleLinkClick(e, `/${cat.fullSlug}`)
-                        }
-                        className="block px-4 py-3 text-[10px] uppercase text-zinc-400 hover:text-white"
-                      >
-                        {cat.name}
-                      </a>
-                    ))}
-                  </div>
+                  <div className="absolute top-full pt-3 left-0 hidden group-hover:block">
+  <div className="bg-black border border-zinc-800 min-w-[200px]">
+    {poloCategories.map((cat) => (
+      <a
+        key={cat.id}
+        href={`/${cat.fullSlug}`}
+        onClick={(e) => handleLinkClick(e, `/${cat.fullSlug}`)}
+        className="block px-4 py-3 text-[10px] uppercase text-zinc-400 hover:text-white"
+      >
+        {cat.name}
+      </a>
+    ))}
+  </div>
+</div>
                 )}
               </div>
             );

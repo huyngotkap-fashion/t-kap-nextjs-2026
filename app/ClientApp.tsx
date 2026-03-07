@@ -260,20 +260,33 @@ T-KAP FASHION
       </>
     );
   };
-  const titleMap: any = {
-  men: "ÁO POLO NAM CAO CẤP",
-  "polo-sport": "POLO SPORT",
-  "pickleball": "POLO PICKLEBALL",
-  "golf": "GOLF"
-};
+  const slugParts = slug?.split("/") || [];
 
-const subtitleMap: any = {
-  men: "Đồng phục doanh nghiệp & áo polo cao cấp",
-  "polo-sport": "Discover the Signature Polo Sport Collection"
-};
+const categorySlug = slugParts[0];
+const subSlug = slugParts[1];
 
-const title = titleMap[slug] || titleMap[activeCategory];
-const subtitle = subtitleMap[slug] || subtitleMap[activeCategory];
+const formatTitle = (str?: string) =>
+  str
+    ?.replace(/-/g, " ")
+    .toUpperCase();
+
+let title = "T-KAP FASHION";
+let subtitle = "Premium Polo & Corporate Uniform";
+
+if (subSlug) {
+  title = `POLO ${formatTitle(subSlug)}`;
+  subtitle = "Performance Polo Collection";
+}
+
+else if (categorySlug === "polo-sport") {
+  title = "POLO SPORT";
+  subtitle = "Discover the Signature Polo Sport Collection";
+}
+
+else if (categorySlug === "men") {
+  title = "ÁO POLO NAM CAO CẤP";
+  subtitle = "Đồng phục doanh nghiệp & áo polo cao cấp";
+}
 
   return (
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">
@@ -294,7 +307,7 @@ const subtitle = subtitleMap[slug] || subtitleMap[activeCategory];
         onOpenCart={() => setIsCartOpen(true)} 
         onOpenWishlist={() => setIsWishlistOpen(true)}
       />
-      <main className="pt-[70px] md:pt-[115px]">{renderContent()}</main>
+      <main className="pt-[64px] md:pt-[115px]">{renderContent()}</main>
       <div className={`fixed inset-0 z-[3000] ${isCartOpen ? 'visible' : 'invisible'}`}>
         <div className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-500 ${isCartOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsCartOpen(false)} />
         <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform duration-500 ease-boss ${isCartOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
