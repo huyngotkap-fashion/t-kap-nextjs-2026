@@ -21,11 +21,12 @@ const StoreLocator: React.FC<StoreLocatorProps> = ({ language, config }) => {
             <div>
               <span className="text-[10px] tracking-[0.5em] font-black text-zinc-400 uppercase mb-4 block">Store Experience</span>
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8 border-b-2 border-black pb-4 inline-block vietnamese-fix">
-                {config.title[language] || config.title['vi']}
-              </h2>
-              <p className="text-zinc-500 text-sm leading-relaxed font-light uppercase tracking-widest vietnamese-fix">
-                {config.description[language] || config.description['vi']}
-              </p>
+  {config.title?.[language] || config.title?.vi || ""}
+</h2>
+
+<p className="text-zinc-500 text-sm leading-relaxed font-light uppercase tracking-widest vietnamese-fix">
+  {config.description?.[language] || config.description?.vi || ""}
+</p>
             </div>
 
             <div className="space-y-10">

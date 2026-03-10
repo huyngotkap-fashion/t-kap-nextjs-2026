@@ -48,10 +48,10 @@ const SingleBanner: React.FC<{
       }`}>
         <div className={`max-w-5xl transition-all duration-[1500ms] ease-[cubic-bezier(0.16, 1, 0.3, 1)] transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
           <h2 className="text-white text-5xl md:text-[7rem] font-extrabold uppercase tracking-tight leading-[1.1] mb-8 vietnamese-fix">
-            {b.title[language] || b.title['vi']}
+            {b.title?.[language] || b.title?.['vi'] || ""}
           </h2>
           <p className="text-zinc-300 text-sm md:text-base uppercase tracking-[0.3em] font-medium mb-12 max-w-2xl mx-auto md:mx-0 delay-100 transition-all duration-1000">
-            {b.description[language] || b.description['vi']}
+            {b.description?.[language] || b.description?.['vi'] || ""}
           </p>
 
           <div className={`flex flex-wrap gap-6 ${
@@ -61,19 +61,21 @@ const SingleBanner: React.FC<{
           }`}>
             <button 
               onClick={(e) => {
-                e.stopPropagation();
-                onAction?.(b.primaryBtnLink);
-              }}
+    e.stopPropagation();
+    if (b.primaryBtnLink) {
+      onAction?.(b.primaryBtnLink);
+    }
+  }}
               className="bg-white text-black px-12 py-5 text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-500 border border-white hover:scale-105 active:scale-95 shadow-xl"
             >
-              {b.primaryBtnText[language] || b.primaryBtnText['vi']}
+              {b.primaryBtnText?.[language] || b.primaryBtnText?.['vi'] || ""}
             </button>
             {(b.secondaryBtnText?.[language] || b.secondaryBtnText?.['vi']) && (
               <button 
                 onClick={(e) => {
-                  e.stopPropagation();
-                  onAction?.(b.secondaryBtnLink);
-                }}
+  e.stopPropagation();
+  b.primaryBtnLink && onAction?.(b.primaryBtnLink);
+}}
                 className="bg-transparent text-white border border-white px-12 py-5 text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 active:scale-95"
               >
                 {b.secondaryBtnText[language] || b.secondaryBtnText?.['vi']}
@@ -123,7 +125,9 @@ const BannerSlider: React.FC<{
 
 const Hero: React.FC<HeroProps> = ({ language, config, activeCategory, onAction }) => {
   const bannerGroups = useMemo(() => {
-    const filtered = config.banners.filter(b => b.targetMenu === activeCategory);
+    const filtered = (config.banners ?? []).filter(
+  (b) => b.targetMenu === activeCategory
+);
     const groups: Record<string, BannerConfig[]> = {};
     filtered.forEach(b => {
       const gid = b.sliderGroupId || 'default';

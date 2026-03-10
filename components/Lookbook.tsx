@@ -23,7 +23,9 @@ const HotspotMarker: React.FC<{
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onNavigate) {
-      const slug = product.name.toLowerCase().replace(/\s+/g, '-');
+      const slug = (product.name?.[language] || product.name?.vi || "")
+  .toLowerCase()
+  .replace(/\s+/g, "-");
       onNavigate(`/product/${slug}-${product.id}`);
     }
   };
@@ -51,7 +53,9 @@ const HotspotMarker: React.FC<{
           </div>
           <div className="space-y-1">
             <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">{product.brand}</p>
-            <h4 className="text-[10px] font-black uppercase tracking-tight text-zinc-900 leading-tight line-clamp-2">{product.name}</h4>
+            <h4 className="text-[10px] font-black uppercase tracking-tight text-zinc-900 leading-tight line-clamp-2">
+  {product.name?.[language] || product.name?.vi}
+</h4>
             <p className="text-[11px] font-black">${product.price}</p>
           </div>
           <div className="flex gap-2 pt-1">

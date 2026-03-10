@@ -28,13 +28,12 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
   },
   partners: [],
   promoPopup: {
-    isActive: false,
-    imageUrl: '',
-    title: { en: '', vi: '' },
-    content: { en: '', vi: '' },
-    link: '',
-    displayDelay: 3
-  },
+  isActive: false,
+  title: { en: '', vi: '' },
+  content: { en: '', vi: '' },
+  buttonLink: '',
+  displayDelay: 3
+},
   logoImageUrl: 'https://res.cloudinary.com/dozhznwuf/image/upload/v1768206325/logo-tkap_hrspdt.png',
   logoRedirect: 'All',
   showHeritage: false,

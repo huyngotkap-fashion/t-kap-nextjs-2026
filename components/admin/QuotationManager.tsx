@@ -3,9 +3,9 @@ import React from 'react';
 import { QuotationRequest, QuotationStatus } from '../../types';
 
 interface QuotationManagerProps {
-  quotations: QuotationRequest[];
-  onUpdateStatus: (q: QuotationRequest, s: QuotationStatus) => void;
-  onDelete: (id: string) => void;
+  quotations: QuotationRequest[]
+  onUpdateStatus: (q: QuotationRequest, status: QuotationStatus) => void
+  onDelete: (id: string) => void
 }
 
 const QuotationManager: React.FC<QuotationManagerProps> = ({ quotations, onUpdateStatus, onDelete }) => {
@@ -16,8 +16,13 @@ const QuotationManager: React.FC<QuotationManagerProps> = ({ quotations, onUpdat
         <div className="py-20 text-center border-4 border-dashed border-zinc-100 text-zinc-300 font-bold uppercase tracking-widest">Hiện chưa có dữ liệu</div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {quotations.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(q => {
-            const isOrder = q.id.startsWith('ORD-') || q.type === 'order';
+          {quotations
+  .sort(
+    (a, b) =>
+      new Date(b.createdAt ?? 0).getTime() -
+      new Date(a.createdAt ?? 0).getTime()
+  ).map(q => {
+            const isOrder = (q.id ?? '').startsWith('ORD-');
             return (
               <div key={q.id} className="bg-white border border-zinc-100 p-8 shadow-sm hover:shadow-md transition-all flex flex-col lg:flex-row justify-between gap-8">
                 <div className="flex-1 space-y-4">
@@ -34,7 +39,9 @@ const QuotationManager: React.FC<QuotationManagerProps> = ({ quotations, onUpdat
                     }`}>
                       {q.status === 'pending' ? 'Mới' : q.status === 'processing' ? 'Đang xử lý' : q.status === 'completed' ? 'Hoàn thành' : 'Đã liên hệ'}
                     </span>
-                    <span className="text-[10px] text-zinc-400 font-bold uppercase">{new Date(q.createdAt).toLocaleString('vi-VN')}</span>
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase">
+  {new Date(q.createdAt ?? 0).toLocaleString('vi-VN')}
+</span>
                   </div>
                   <div>
                     <h4 className="text-xl font-black uppercase mb-1">{q.customerName}</h4>
@@ -45,15 +52,19 @@ const QuotationManager: React.FC<QuotationManagerProps> = ({ quotations, onUpdat
                     <span className="text-[9px] font-bold text-zinc-400 uppercase block mb-3">Sản phẩm chi tiết:</span>
                     <div className="space-y-3">
                       {isOrder && q.productDetails ? (
-                        q.productDetails.map((item, i) => (
-                          <div key={i} className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                            <span>• {item.name} (Size: {item.size})</span>
-                            <span>${item.price}</span>
-                          </div>
-                        ))
-                      ) : (
-                        q.productNames.map((name, i) => <div key={i} className="text-xs font-bold uppercase tracking-tight">• {name}</div>)
-                      )}
+  q.productDetails.map((item, i) => (
+    <div key={i} className="flex justify-between text-xs font-bold uppercase tracking-tight">
+      <span>• {item.name} (Size: {item.size})</span>
+      <span>${item.price}</span>
+    </div>
+  ))
+) : (
+  (q.productNames ?? []).map((name, i) => (
+    <div key={i} className="text-xs font-bold uppercase tracking-tight">
+      • {name}
+    </div>
+  ))
+)}
                     </div>
                     {isOrder && q.totalAmount && (
                       <div className="mt-4 pt-4 border-t border-zinc-200 flex justify-between items-baseline">

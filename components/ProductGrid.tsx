@@ -15,6 +15,7 @@ const createSlug = (str: string) => {
     .replace(/^-+|-+$/g, '');
 };
 
+
 const formatPrice = (price: number) => {
   return price.toLocaleString('vi-VN') + ' VNĐ';
 };
@@ -38,11 +39,12 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWishlist, index }) => {
-  const [isHovered, setIsHovered] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
   const [scrubIndex, setScrubIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const productPath = `/product/${createSlug(product.name)}-${product.id}`;
+  const name = product.name?.vi ?? "";
+const productPath = `/product/${createSlug(name)}-${product.id}`;
   const has360 = product.threeSixtyImages && product.threeSixtyImages.length > 0;
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -90,13 +92,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
           {has360 && isHovered ? (
             <img
               src={product.threeSixtyImages![scrubIndex]}
-              alt={product.name}
+              alt={product.name?.vi ?? ""}
               className="w-full h-full object-cover transition-opacity duration-150"
             />
           ) : (
             <img
               src={product.imageUrl}
-              alt={product.name}
+              alt={product.name?.vi ?? ""}
               className="w-full h-full object-cover transition-transform duration-[2.5s] ease-[cubic-bezier(0.16, 1, 0.3, 1)] group-hover:scale-110"
             />
           )}
@@ -118,7 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
 
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-700"></div>
 
-          {product.pricingType === 'price' && product.originalPrice && product.originalPrice > product.price && (
+          {product.pricingType === 'price' && product.originalPrice && product.originalPrice > (product.price ?? 0) && (
             <div className="absolute top-12 left-4 bg-black text-white px-2 py-0.5 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500">
               <span className="text-[9px] font-bold tracking-widest uppercase">SALE</span>
             </div>
@@ -127,16 +129,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isWished, onToggleWi
 
         <div className="px-1 space-y-1">
           <h3 className="text-[11px] md:text-[12px] font-medium text-zinc-900 tracking-wide uppercase leading-tight transition-colors duration-300 group-hover:text-zinc-500">
-            {product.name}
+            {name}
           </h3>
           <div className="flex flex-col gap-0.5">
   {product.pricingType === 'price' && (
     <>
       <p className="text-[13px] font-black text-zinc-900 tracking-tighter transition-transform duration-300 group-hover:translate-x-1 origin-left">
-        {formatPrice(product.price)}
+        {formatPrice(product.price ?? 0)}
       </p>
 
-      {product.originalPrice && product.originalPrice > product.price && (
+      {product.originalPrice && product.originalPrice > (product.price ?? 0) && (
         <p className="text-[11px] text-zinc-400 line-through tracking-tighter">
           {formatPrice(product.originalPrice)}
         </p>

@@ -19,15 +19,18 @@ const Partners: React.FC<PartnersProps> = ({ language, partners }) => {
         
         <div className="flex flex-wrap justify-center items-center gap-x-12 md:gap-x-20 gap-y-8 md:gap-y-12 opacity-40 hover:opacity-100 transition-opacity duration-700">
            {partners.map((p) => (
-             <div key={p.id} className="h-6 md:h-12 flex items-center grayscale hover:grayscale-0 transition-all duration-500">
-                <img 
-                  src={p.logoUrl} 
-                  alt={p.name} 
-                  className="h-full w-auto object-contain"
-                  title={p.name}
-                />
-             </div>
-           ))}
+  <div
+    key={p.id}
+    className="h-6 md:h-12 flex items-center grayscale hover:grayscale-0 transition-all duration-500"
+  >
+    <img
+      src={p.logoUrl}
+      alt={p.name}
+      title={p.name}
+      className="h-full w-auto object-contain"
+    />
+  </div>
+))}
         </div>
       </div>
     </section>

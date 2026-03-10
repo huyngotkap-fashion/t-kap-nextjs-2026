@@ -86,14 +86,22 @@ const QuotationForm: React.FC<QuotationFormProps> = ({
       const request: QuotationRequest = {
         id: requestId,
         userId: user?.id || undefined,
-        type: (isOrder && !hasQuotationItems) ? 'order' : 'inquiry',
+        type: (isOrder && !hasQuotationItems ? "order" : "quotation") as "order" | "quotation",
         customerName: formData.customerName,
         phone: formData.phone,
         email: formData.email,
         companyName: formData.companyName,
         productIds: formData.selectedProductIds,
-        productNames: products.filter(p => formData.selectedProductIds.includes(p.id)).map(p => p.name),
-        productDetails: displayCartItems.map(i => ({ id: i.id, name: i.name, size: i.selectedSize || 'N/A', price: i.pricingType === 'quotation' ? 0 : i.price })),
+        productNames: products
+  .filter(p => formData.selectedProductIds.includes(p.id))
+  .map(p => p.name?.[language] || p.name?.vi || ""),
+
+productDetails: displayCartItems.map(i => ({
+  id: i.id,
+  name: i.name?.[language] || i.name?.vi || "",
+  size: i.selectedSize || "N/A",
+  price: i.pricingType === "quotation" ? 0 : i.price
+})),
         totalAmount: totalPricedAmount,
         notes: formData.notes,
         status: 'pending',
@@ -169,11 +177,11 @@ const QuotationForm: React.FC<QuotationFormProps> = ({
                     <img
   src={item.imageUrl}
   className="w-full h-full object-cover grayscale"
-  alt={item.name}
+  alt={item.name?.[language] || item.name?.vi || ""}
 />
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-[10px] font-black uppercase leading-tight">{item.name}</h4>
+                    <h4 className="text-[10px] font-black uppercase leading-tight">{item.name[language]}</h4>
                     <p className="text-[9px] text-zinc-400 font-bold mt-1 uppercase">Size: {item.selectedSize || 'N/A'} | SL: {item.quantity}</p>
                     <p className="text-[11px] font-black mt-2">
                       {item.pricingType === 'quotation' 
@@ -190,12 +198,12 @@ const QuotationForm: React.FC<QuotationFormProps> = ({
                     <div className="w-16 h-20 bg-zinc-100 overflow-hidden"><img
   src={p.imageUrl}
   className="w-full h-full object-cover grayscale"
-  alt={p.name}
+  alt={p.name[language]}  
 /></div>
                     <div className="flex-1">
-                      <h4 className="text-[10px] font-bold uppercase">{p.name}</h4>
+                      <h4 className="text-[10px] font-bold uppercase">{p.name[language]}</h4>
                       <p className="text-[9px] font-black mt-1">
-                        {p.pricingType === 'quotation' ? (language === 'vi' ? 'Báo giá' : 'Quote') : formatPrice(p.price)}
+                        {p.pricingType === 'quotation' ? (language === 'vi' ? 'Báo giá' : 'Quote') : formatPrice(p.price ?? 0)}
                       </p>
                     </div>
                   </div>

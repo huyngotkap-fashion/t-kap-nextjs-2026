@@ -31,16 +31,32 @@ const BlogManager: React.FC<BlogManagerProps> = ({
     const html = contentRef.current?.innerHTML || ''
 
     const finalBlog: Blog = {
-      id: editingBlog?.id || Date.now().toString(),
-      title: blogForm.title || { vi: '', en: '' },
-      shortDesc: blogForm.shortDesc || { vi: '', en: '' },
-      content: { vi: html, en: '' },
-      imageUrl: blogForm.imageUrl || '',
-      videoUrl: blogForm.videoUrl || '',
-      category: blogForm.category || { vi: '', en: '' },
-      date: blogForm.date || new Date().toISOString().split('T')[0],
-      author: blogForm.author || 'T-KAP'
-    }
+  id: editingBlog?.id || Date.now().toString(),
+
+  title: blogForm.title || { vi: '', en: '' },
+
+  shortDesc: blogForm.shortDesc || { vi: '', en: '' },
+
+  content: { vi: html, en: '' },
+
+  imageUrl: blogForm.imageUrl || '',
+
+  videoUrl: blogForm.videoUrl || '',
+
+  category: blogForm.category || { vi: '', en: '' },
+
+  date: blogForm.date || new Date().toISOString().split('T')[0],
+
+  author: blogForm.author || 'T-KAP',
+
+  slug:
+    blogForm.title?.vi
+      ?.toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '') || Date.now().toString(),
+
+  createdAt: editingBlog?.createdAt || new Date().toISOString()
+}
 
     if (editingBlog) onUpdateBlog(finalBlog)
     else onAddBlog(finalBlog)
@@ -70,11 +86,11 @@ const BlogManager: React.FC<BlogManagerProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...blogs]
-              .sort(
-                (a, b) =>
-                  new Date(b.date).getTime() -
-                  new Date(a.date).getTime()
-              )
+              .sort((a, b) => {
+  const dateA = new Date(a.date ?? 0).getTime()
+  const dateB = new Date(b.date ?? 0).getTime()
+  return dateB - dateA
+})
               .map(blog => (
                 <div
                   key={blog.id}

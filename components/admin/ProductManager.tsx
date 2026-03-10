@@ -6,6 +6,7 @@ import { getCollectionOnce } from "../../services/firebaseService";
 
 interface ProductManagerProps {
   products: Product[];
+  language: "en" | "vi";
   onAddProduct: (p: Product) => void;
   onUpdateProduct: (p: Product) => void;
   onDeleteProduct: (id: string) => void;
@@ -20,6 +21,7 @@ const ProductManager: React.FC<ProductManagerProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<Partial<Product>>({});
+  const language: "vi" | "en" = "vi";
   const [batch360Text, setBatch360Text] = useState(""); 
   const [hotspotEditorMediaIdx, setHotspotEditorMediaIdx] = useState<number | null>(null);
   const descRef = useRef<HTMLDivElement>(null);
@@ -63,7 +65,7 @@ const childCategories = categories.filter(
 
     const finalData: Product = {
       id: editingProduct?.id || Date.now().toString(),
-      name: form.name || 'Untitled',
+      name: form.name || { vi: "Chưa đặt tên", en: "Untitled" },
       brand: form.brand || 'T-KAP',
       category: form.category || 'men',
       subCategory: form.subCategory || 'Classic',
@@ -74,7 +76,10 @@ const childCategories = categories.filter(
       imageUrl: form.imageUrl || '',
       media: form.media || [],
       threeSixtyImages: final360Images,
-      description: html,
+      description: {
+  vi: html,
+  en: html
+},
       status: (form.status as any) || 'active',
       colors: form.colors || [],
       sizes: form.sizes || []
@@ -94,7 +99,10 @@ const childCategories = categories.filter(
     const copiedProduct: Product = {
       ...p,
       id: `copy-${Date.now()}`,
-      name: `${p.name} (Bản sao)`
+      name: {
+  en: `${p.name.en} (Copy)`,
+  vi: `${p.name.vi} (Bản sao)`
+}
     };
     setEditingProduct(null);
     setForm(copiedProduct);
@@ -178,7 +186,19 @@ const childCategories = categories.filter(
             <div className="space-y-4">
               <div>
                 <label className={labelBase}>Tên sản phẩm</label>
-                <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className={inputBase} />
+                <input
+  value={form.name?.vi || ""}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      name: {
+        vi: e.target.value,
+        en: form.name?.en || ""
+      }
+    })
+  }
+  className={inputBase}
+/>
               </div>
               <div>
   <label className={labelBase}>Thương hiệu</label>
@@ -381,7 +401,15 @@ className={inputBase}
             </div>
           ) : (
             <div className="max-w-4xl w-full">
-              <RichTextEditor contentRef={descRef} initialContent={editingProduct?.description || (form.description || '')} label="Mô tả sản phẩm" />
+              <RichTextEditor
+  contentRef={descRef}
+  initialContent={
+    editingProduct?.description?.vi ||
+    form.description?.vi ||
+    ""
+  }
+  label="Mô tả sản phẩm"
+/>
             </div>
           )}
         </div>
@@ -403,7 +431,7 @@ className={inputBase}
               <img 
   src={p.imageUrl} 
   className={`w-full h-full object-cover transition-transform group-hover:scale-110 ${p.status === 'hidden' ? 'grayscale opacity-50' : ''}`} 
-  alt={p.name}
+  alt={p.name[language]}
 />
               <div className="absolute top-2 left-2 flex flex-col gap-1">
                 {p.status === 'hidden' && <span className="bg-zinc-500 text-white text-[7px] font-black px-2 py-0.5 uppercase w-fit">ĐANG ẨN</span>}
@@ -412,7 +440,7 @@ className={inputBase}
               </div>
               {(p.media?.some(m => m.hotspots && m.hotspots.length > 0)) && <span className="absolute top-2 right-2 bg-red-600 text-white text-[7px] font-black px-2 py-0.5 uppercase">HOTSPOTS</span>}
             </div>
-            <h4 className={`font-bold uppercase text-[10px] truncate mb-1 ${p.status === 'hidden' ? 'text-zinc-400' : ''}`}>{p.name}</h4>
+            <h4 className={`font-bold uppercase text-[10px] truncate mb-1 ${p.status === 'hidden' ? 'text-zinc-400' : ''}`}>{p.name[language]}</h4>
             <div className="flex flex-wrap gap-x-3 gap-y-2 pt-4 mt-4 border-t border-zinc-50">
               <button onClick={() => { setEditingProduct(p); setForm(p); setIsEditing(true); }} className="text-[9px] font-black uppercase tracking-widest text-zinc-900 hover:underline">Sửa</button>
               <button 

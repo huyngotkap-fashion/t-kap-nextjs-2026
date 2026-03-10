@@ -59,15 +59,22 @@ const Heritage: React.FC<HeritageProps> = ({ language, config }) => {
               <span className="text-[10px] md:text-[12px] tracking-[0.6em] font-black text-zinc-400 uppercase mb-4 block animate-reveal">
                 {subtitle}
               </span>
-              <h2 className="text-4xl md:text-7xl lg:text-[6rem] font-black leading-[1.05] text-zinc-900 uppercase tracking-tighter vietnamese-fix animate-reveal delay-100" 
-                dangerouslySetInnerHTML={{ __html: title }} 
-              />
+              <h2
+  className="text-4xl md:text-7xl lg:text-[6rem] font-black leading-[1.05] text-zinc-900 uppercase tracking-tighter vietnamese-fix animate-reveal delay-100"
+  dangerouslySetInnerHTML={{ __html: title ?? "" }}
+/>
             </div>
 
             <div className="space-y-6 md:space-y-10 text-sm md:text-xl font-light text-zinc-600 leading-relaxed max-w-xl animate-reveal delay-200">
-              <p className="text-zinc-500 font-normal vietnamese-fix" dangerouslySetInnerHTML={{ __html: desc1 }} />
+              <p
+  className="font-black text-zinc-900 uppercase tracking-tight text-xl md:text-2xl vietnamese-fix"
+  dangerouslySetInnerHTML={{ __html: desc2 ?? "" }}
+/>
               <div className="w-16 h-px bg-zinc-300 my-8"></div>
-              <p className="font-black text-zinc-900 uppercase tracking-tight text-xl md:text-2xl vietnamese-fix" dangerouslySetInnerHTML={{ __html: desc2 }} />
+              <p
+  className="font-black text-zinc-900 uppercase tracking-tight text-xl md:text-2xl vietnamese-fix"
+  dangerouslySetInnerHTML={{ __html: desc2 ?? "" }}
+/>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 pt-10 border-t border-zinc-100 animate-reveal delay-300">

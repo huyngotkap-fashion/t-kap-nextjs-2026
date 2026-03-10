@@ -24,7 +24,7 @@ const PromoPopup: React.FC<PromoPopupProps> = ({ config, language }) => {
     if (!lastDismissed || (now - parseInt(lastDismissed) > frequencyMs)) {
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, config.displayDelay * 1000);
+      }, (config.displayDelay ?? 0) * 1000);
       return () => clearTimeout(timer);
     }
   }, [config.isActive, config.displayDelay, config.frequencyDays]);
@@ -105,10 +105,10 @@ const PromoPopup: React.FC<PromoPopupProps> = ({ config, language }) => {
             <div className="text-center md:text-left">
               <span className="text-[10px] font-black tracking-[0.5em] text-zinc-300 uppercase block mb-4">Special Invitation</span>
               <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-6 leading-none vietnamese-fix">
-                {config.title[language] || config.title['vi']}
+                {config.title?.[language] ?? config.title?.vi ?? ""}
               </h2>
               <p className="text-zinc-500 text-sm md:text-base leading-relaxed font-light uppercase tracking-widest vietnamese-fix">
-                {config.content[language] || config.content['vi']}
+                {config.content?.[language] ?? config.content?.vi ?? ""}
               </p>
             </div>
 
@@ -155,7 +155,7 @@ const PromoPopup: React.FC<PromoPopupProps> = ({ config, language }) => {
               </form>
             ) : (
               <a 
-                href={config.link}
+                href={config.buttonLink}
                 onClick={handleClose}
                 className="block w-full bg-black text-white py-6 text-center text-[10px] font-black uppercase tracking-[0.4em] hover:bg-zinc-800 transition-all shadow-2xl"
               >

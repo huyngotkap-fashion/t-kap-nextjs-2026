@@ -58,8 +58,11 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
   const addNavItem = () => {
     const newItem: MenuItem = {
       id: crypto.randomUUID(),
-      label: { en: "New", vi: "Mới" },
+      label: { en: "New Menu", vi: "Menu mới" },
       targetCategory: "/",
+      type: "category",
+      order: Date.now(),
+      isActive: true,
     };
 
     onUpdate({
@@ -122,12 +125,12 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
   };
 
   const activeLPs = landingPages.filter((lp) => lp.isActive);
-  const activeHiddenLinks = hiddenLinks.filter((l) => l.isActive);
 
   /* ===================================================================== */
 
   return (
     <div className="space-y-20 pb-40">
+
       {/* ================= HEADER MENU ================= */}
 
       <section>
@@ -145,70 +148,171 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {config.navItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white border p-6 shadow-sm space-y-4"
-            >
-              {/* VI */}
-              <div>
-                <label className={labelBase}>Tên hiển thị (VI)</label>
-                <input
-                  value={item.label.vi}
-                  onChange={(e) =>
-                    updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
-                      ...i,
-                      label: { ...i.label, vi: e.target.value },
-                    }))
-                  }
-                  className={inputBase}
-                />
-              </div>
 
-              {/* EN */}
-              <div>
-                <label className={labelBase}>Tên hiển thị (EN)</label>
-                <input
-                  value={item.label.en}
-                  onChange={(e) =>
-                    updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
-                      ...i,
-                      label: { ...i.label, en: e.target.value },
-                    }))
-                  }
-                  className={inputBase}
-                />
-              </div>
+          {config.navItems
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((item) => (
 
-              {/* SLUG */}
-              <div>
-                <label className={labelBase}>Đường dẫn</label>
-                <input
-                  value={item.targetCategory}
-                  onChange={(e) =>
-                    updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
-                      ...i,
-                      targetCategory: e.target.value,
-                    }))
-                  }
-                  className={inputBase}
-                />
-              </div>
-
-              <button
-                onClick={() => removeNavItem(item.id)}
-                className="text-red-500 text-xs font-bold"
+              <div
+                key={item.id}
+                className="bg-white border p-6 shadow-sm space-y-4"
               >
-                Xóa
-              </button>
-            </div>
-          ))}
+
+                {/* MENU TYPE */}
+
+                <div>
+                  <label className={labelBase}>Loại menu</label>
+
+                  <select
+                    value={item.type}
+                    onChange={(e) =>
+                      updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                        ...i,
+                        type: e.target.value as any,
+                      }))
+                    }
+                    className={inputBase}
+                  >
+                    <option value="category">Category</option>
+                    <option value="landing">Landing Page</option>
+                    <option value="external">External Link</option>
+                  </select>
+                </div>
+
+                {/* VI */}
+
+                <div>
+                  <label className={labelBase}>Tên hiển thị (VI)</label>
+                  <input
+                    value={item.label.vi}
+                    onChange={(e) =>
+                      updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                        ...i,
+                        label: { ...i.label, vi: e.target.value },
+                      }))
+                    }
+                    className={inputBase}
+                  />
+                </div>
+
+                {/* EN */}
+
+                <div>
+                  <label className={labelBase}>Tên hiển thị (EN)</label>
+                  <input
+                    value={item.label.en}
+                    onChange={(e) =>
+                      updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                        ...i,
+                        label: { ...i.label, en: e.target.value },
+                      }))
+                    }
+                    className={inputBase}
+                  />
+                </div>
+
+                {/* CATEGORY OR LINK */}
+
+                {item.type === "landing" && (
+                  <div>
+                    <label className={labelBase}>Landing Page</label>
+
+                    <select
+                      value={item.targetCategory}
+                      onChange={(e) =>
+                        updateArrayItem<MenuItem>(
+                          "navItems",
+                          item.id,
+                          (i) => ({
+                            ...i,
+                            targetCategory: `/landing/${e.target.value}`,
+                          })
+                        )
+                      }
+                      className={inputBase}
+                    >
+                      {activeLPs.map((lp) => (
+                        <option key={lp.slug} value={lp.slug}>
+                          {lp.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {item.type === "external" && (
+                  <div>
+                    <label className={labelBase}>External URL</label>
+                    <input
+                      value={item.targetCategory}
+                      onChange={(e) =>
+                        updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                          ...i,
+                          targetCategory: e.target.value,
+                        }))
+                      }
+                      className={`${inputBase} ${
+                        !isValidUrl(item.targetCategory)
+                          ? "border-red-400"
+                          : ""
+                      }`}
+                    />
+                  </div>
+                )}
+
+                {item.type === "category" && (
+                  <div>
+                    <label className={labelBase}>Slug Category</label>
+
+                    <input
+                      value={item.targetCategory}
+                      onChange={(e) =>
+                        updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                          ...i,
+                          targetCategory: e.target.value,
+                        }))
+                      }
+                      className={inputBase}
+                    />
+                  </div>
+                )}
+
+                {/* ACTIVE */}
+
+                <button
+                  onClick={() =>
+                    updateArrayItem<MenuItem>("navItems", item.id, (i) => ({
+                      ...i,
+                      isActive: !i.isActive,
+                    }))
+                  }
+                  className={`px-4 py-2 text-xs font-bold ${
+                    item.isActive
+                      ? "bg-black text-white"
+                      : "bg-zinc-200"
+                  }`}
+                >
+                  {item.isActive ? "Đang bật" : "Đang tắt"}
+                </button>
+
+                {/* DELETE */}
+
+                <button
+                  onClick={() => removeNavItem(item.id)}
+                  className="text-red-500 text-xs font-bold"
+                >
+                  Xóa
+                </button>
+
+              </div>
+            ))}
         </div>
       </section>
 
       {/* ================= HIDDEN LINKS ================= */}
 
       <section className="bg-zinc-50 p-10 border">
+
         <div className="flex justify-between items-center mb-10 border-b pb-4">
           <h3 className="text-xl font-black uppercase">
             Quản lý Link Ẩn
@@ -223,12 +327,16 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
         </div>
 
         <div className="space-y-4">
+
           {hiddenLinks.map((link) => (
+
             <div
               key={link.id}
               className="bg-white border p-6 shadow-sm space-y-4"
             >
+
               <div className="grid md:grid-cols-3 gap-4">
+
                 <div>
                   <label className={labelBase}>Tiêu đề</label>
                   <input
@@ -283,6 +391,7 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
               </div>
 
               <div className="flex gap-4">
+
                 <button
                   onClick={() =>
                     updateArrayItem<HiddenLink>(
@@ -306,101 +415,16 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                 >
                   Xóa
                 </button>
+
               </div>
             </div>
+
           ))}
+
         </div>
+
       </section>
 
-      {/* ================= BRAND TABS ================= */}
-
-      <section>
-        <div className="flex justify-between items-center mb-10 border-b pb-4">
-          <h3 className="text-xl font-black uppercase">
-            Danh mục Thương hiệu
-          </h3>
-
-          <button
-            onClick={addBrandItem}
-            className="bg-black text-white px-6 py-2 text-[10px] font-bold uppercase"
-          >
-            + Thêm
-          </button>
-        </div>
-
-        <div className="flex flex-wrap gap-4">
-          {config.brandNavItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-zinc-50 border p-6 w-64 shadow-sm space-y-4 relative"
-            >
-              <button
-                onClick={() => removeBrandItem(item.id)}
-                className="absolute top-2 right-2 text-zinc-400"
-              >
-                ✕
-              </button>
-
-              {/* VI */}
-              <div>
-                <label className={labelBase}>Tên (VI)</label>
-                <input
-                  value={item.label.vi}
-                  onChange={(e) =>
-                    updateArrayItem<BrandNavItem>(
-                      "brandNavItems",
-                      item.id,
-                      (i) => ({
-                        ...i,
-                        label: { ...i.label, vi: e.target.value },
-                      })
-                    )
-                  }
-                  className={inputBase}
-                />
-              </div>
-
-              {/* EN */}
-              <div>
-                <label className={labelBase}>Tên (EN)</label>
-                <input
-                  value={item.label.en}
-                  onChange={(e) =>
-                    updateArrayItem<BrandNavItem>(
-                      "brandNavItems",
-                      item.id,
-                      (i) => ({
-                        ...i,
-                        label: { ...i.label, en: e.target.value },
-                      })
-                    )
-                  }
-                  className={inputBase}
-                />
-              </div>
-
-              {/* SLUG */}
-              <div>
-                <label className={labelBase}>Slug</label>
-                <input
-                  value={item.targetCategory}
-                  onChange={(e) =>
-                    updateArrayItem<BrandNavItem>(
-                      "brandNavItems",
-                      item.id,
-                      (i) => ({
-                        ...i,
-                        targetCategory: e.target.value,
-                      })
-                    )
-                  }
-                  className={inputBase}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 };

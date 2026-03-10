@@ -90,7 +90,7 @@ const BannerManager: React.FC<BannerManagerProps> = ({
   const parentValue = clone[parentKey];
 
   if (typeof parentValue === "object" && parentValue !== null) {
-    (parentValue as Record<string, unknown>)[child] = value;
+    (parentValue as unknown as Record<string, unknown>)[child] = value;
   }
 } else {
   (clone as unknown as Record<string, unknown>)[field] = value;

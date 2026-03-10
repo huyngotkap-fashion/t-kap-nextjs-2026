@@ -44,12 +44,16 @@ const App: React.FC = () => {
   const { wishlist, toggleWishlist, wishlistProducts } = useWishlist(products);
   const { navigate, routeInfo, matchedLandingPage, matchedHiddenLink, activeCategory } = useNavigation(landingPages, siteConfig);
 
-  useSeo({
+  const product =
+  routeInfo.type === "product"
+    ? products.find(p => p.id === routeInfo.id)
+    : undefined;
+
+useSeo({
   title:
-  routeInfo.type === 'product' && routeInfo.id
-    ? products.find(p => p.id === routeInfo.id)?.name
-    : matchedLandingPage?.title || matchedHiddenLink?.title,
-  lang: language
+    routeInfo.type === 'product'
+      ? product?.name?.[language]
+      : matchedLandingPage?.title ?? matchedHiddenLink?.title,
 });
 
   const handleWishlistToCartAction = (p: Product) => {
@@ -125,7 +129,12 @@ const App: React.FC = () => {
     }
 
     if (activeCategory === 'Stores') {
-      return <StoreLocator language={language} config={siteConfig.storesPage} />;
+      return (
+  <StoreLocator
+    language={language}
+    config={siteConfig.storesPage || { locations: [] }}
+  />
+);
     }
 
     if (activeCategory === 'Quotation' || activeCategory === 'Checkout') {
@@ -175,7 +184,9 @@ const App: React.FC = () => {
           </div>
           <ProductCarousel products={products} wishlist={wishlist} onToggleWishlist={toggleWishlist} />
         </div>
-        {siteConfig.showPartners && <Partners language={language} partners={siteConfig.partners} />}
+        {siteConfig.showPartners && (
+  <Partners language={language} partners={siteConfig.partners || []} />
+)}
       </>
     );
   };
@@ -211,11 +222,11 @@ const App: React.FC = () => {
             {cart.length > 0 ? cart.map((item, idx) => (
               <div key={`${item.id}-${idx}`} className="flex gap-6 group">
                 <div className="w-24 h-32 bg-zinc-50 shrink-0 overflow-hidden">
-                  <img src={item.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
+                  <img src={item.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt={item.name[language]} />
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{item.name}</h4>
+                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{item.name[language]}</h4>
                     <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Size: {item.selectedSize || 'N/A'}</p>
                   </div>
                   <div className="flex justify-between items-end">
@@ -252,19 +263,26 @@ const App: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
             {wishlistProducts.length > 0 ? wishlistProducts.map((p) => (
               <div key={p.id} className="flex gap-6 group">
-                <div className="w-24 h-32 bg-zinc-50 shrink-0 overflow-hidden cursor-pointer" onClick={() => { setIsWishlistOpen(false); navigate(`/product/${p.name.toLowerCase().replace(/\s+/g, '-')}-${p.id}`); }}>
+                <div className="w-24 h-32 bg-zinc-50 shrink-0 overflow-hidden cursor-pointer" onClick={() => { setIsWishlistOpen(false); navigate(`/product/${(p.name?.[language] || p.name?.vi || "").toLowerCase().replace(/\s+/g, '-')}-${p.id}`); }}>
                   <img src={p.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{p.name}</h4>
-                    <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">{p.brand}</p>
+                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">
+  {p.name[language]}
+</h4>
+
+<p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">
+  {p.brand}
+</p>
                   </div>
                   <div className="flex flex-col gap-3">
                     <span className="text-sm font-black uppercase tracking-tighter">
                       {p.pricingType === 'quotation' 
                         ? (language === 'vi' ? 'Báo giá' : 'Quote')
-                        : formatPrice(p.price)
+                        : p.price
+    ? formatPrice(p.price)
+    : ''
                       }
                     </span>
                     <div className="flex gap-4">

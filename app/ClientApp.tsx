@@ -1,6 +1,6 @@
 
 "use client";
-
+import { slugify } from "@/utils/slugify";
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -129,7 +129,12 @@ useNavigation(
 }
 
     if (activeCategory === 'Stores') {
-      return <StoreLocator language={language} config={siteConfig.storesPage} />;
+      return (
+  <StoreLocator
+    language={language}
+    config={siteConfig.storesPage || { locations: [] }}
+  />
+);
     }
 
     if (activeCategory === 'Quotation' || activeCategory === 'Checkout') {
@@ -140,7 +145,7 @@ useNavigation(
       return user ? <OrderHistory user={user} language={language} products={products} /> : <div className="h-[60vh] flex items-center justify-center">Please log in to view history</div>;
     }
 
-    if (activeCategory) {
+    if (activeCategory && activeCategory !== "All") {
 
   const normalize = (str: string) =>
   str
@@ -256,7 +261,9 @@ T-KAP FASHION
           </div>
           <ProductCarousel products={products} wishlist={wishlist} onToggleWishlist={toggleWishlist} />
         </div>
-        {siteConfig.showPartners && <Partners language={language} partners={siteConfig.partners} />}
+        {siteConfig.showPartners && (
+  <Partners language={language} partners={siteConfig.partners || []} />
+)}
       </>
     );
   };
@@ -323,11 +330,11 @@ else if (categorySlug === "men") {
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{item.name}</h4>
+                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{item.name[language]}</h4>
                     <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Size: {item.selectedSize || 'N/A'}</p>
                   </div>
                   <div className="flex justify-between items-end">
-                    <span className="text-sm font-black">{formatPrice(item.price)}</span>
+                    <span className="text-sm font-black">{formatPrice(item.price || 0)}</span>
                     <button onClick={() => removeFromCart(item.id, item.selectedSize)} className="text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-black underline">Remove</button>
                   </div>
                 </div>
@@ -360,20 +367,20 @@ else if (categorySlug === "men") {
           <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
             {wishlistProducts.length > 0 ? wishlistProducts.map((p) => (
               <div key={p.id} className="flex gap-6 group">
-                <div className="w-24 h-32 bg-zinc-50 shrink-0 overflow-hidden cursor-pointer" onClick={() => { setIsWishlistOpen(false); navigate(`/product/${p.name.toLowerCase().replace(/\s+/g, '-')}-${p.id}`); }}>
+                <div className="w-24 h-32 bg-zinc-50 shrink-0 overflow-hidden cursor-pointer" onClick={() => { setIsWishlistOpen(false); navigate(`/product/${slugify(p.name?.[language] || p.name?.vi || "")}-${p.id}`); }}>
                   <img src={p.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{p.name}</h4>
+                    <h4 className="text-[11px] font-black uppercase leading-tight mb-1">{p.name[language]}</h4>
                     <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">{p.brand}</p>
                   </div>
                   <div className="flex flex-col gap-3">
                     <span className="text-sm font-black uppercase tracking-tighter">
-                      {p.pricingType === 'quotation' 
-                        ? (language === 'vi' ? 'Báo giá' : 'Quote')
-                        : formatPrice(p.price)
-                      }
+                      {p.pricingType === 'quotation'
+  ? (language === 'vi' ? 'Báo giá' : 'Quote')
+  : formatPrice(p.price || 0)
+}
                     </span>
                     <div className="flex gap-4">
                       <button 

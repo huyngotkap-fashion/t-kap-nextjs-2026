@@ -139,10 +139,11 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 
   const t = translations[language].product;
 
-  const currentMedia: ProductMedia = (product.media && product.media.length > activeMediaIdx) 
-    ? product.media[activeMediaIdx] 
-    : { type: 'image', url: product.imageUrl, hotspots: [] };
-
+  const currentMedia: ProductMedia =
+  product.media && product.media.length > activeMediaIdx
+    ? product.media[activeMediaIdx]
+    : { type: "image", url: product.imageUrl ?? "", hotspots: [] };
+    
   const relatedProducts = useMemo(() => {
     return allProducts
       .filter(p => p.id !== product.id && p.category === product.category)
@@ -192,7 +193,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                 {currentMedia?.type === 'video' ? (
                   <video key={currentMedia.url} src={currentMedia.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
                 ) : (
-                  <img key={currentMedia?.url} src={currentMedia?.url} alt={product.name} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-boss group-hover:scale-105" />
+                  <img key={currentMedia?.url} src={currentMedia?.url} alt={product.name?.[language] ?? product.name?.vi ?? ""} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-boss group-hover:scale-105" />
                 )}
 
                 {!show360 && currentMedia.type === 'image' && currentMedia.hotspots?.map((hs) => (
@@ -203,10 +204,10 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
             
             {!show360 && product.media && product.media.length > 1 && (
               <>
-                <button onClick={() => setActiveMediaIdx((prev) => (prev - 1 + product.media.length) % product.media.length)} className="absolute left-8 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-xl p-6 shadow-2xl hover:bg-black hover:text-white transition-all z-20 opacity-0 group-hover:opacity-100">
+                <button onClick={() => setActiveMediaIdx((prev) => (prev - 1 + (product.media?.length || 1)) % (product.media?.length || 1))} className="absolute left-8 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-xl p-6 shadow-2xl hover:bg-black hover:text-white transition-all z-20 opacity-0 group-hover:opacity-100">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" /></svg>
                 </button>
-                <button onClick={() => setActiveMediaIdx((prev) => (prev + 1) % product.media.length)} className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-xl p-6 shadow-2xl hover:bg-black hover:text-white transition-all z-20 opacity-0 group-hover:opacity-100">
+                <button onClick={() => setActiveMediaIdx((prev) => (prev + 1) % (product.media?.length || 1))} className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-xl p-6 shadow-2xl hover:bg-black hover:text-white transition-all z-20 opacity-0 group-hover:opacity-100">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" /></svg>
                 </button>
               </>
@@ -222,7 +223,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                   ) : (
                     <img
   src={m.url}
-  alt={product.name}
+  alt={product.name?.[language] ?? product.name?.vi ?? ""}
   className="w-full h-full object-cover"
 />
                   )}
@@ -240,14 +241,14 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                 <span className="w-1.5 h-1.5 bg-black rounded-full"></span>
                 <span className="text-[11px] font-black tracking-[0.4em] uppercase text-zinc-900">{product.brand}</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-900 mb-10 leading-[1.1] uppercase tracking-tighter vietnamese-fix">{product.name}</h1>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-900 mb-10 leading-[1.1] uppercase tracking-tighter vietnamese-fix">{product.name?.[language] ?? product.name?.vi ?? ""}</h1>
               <div className="flex flex-col gap-2">
                 {isQuotationOnly ? (
                   <p className="text-2xl font-black text-black uppercase tracking-widest">{language === 'vi' ? 'Giá: Báo giá' : 'Price: Quote'}</p>
                 ) : (
                   <>
-                    <p className="text-4xl font-black text-black">{formatPrice(product.price)}</p>
-                    {product.originalPrice && product.originalPrice > product.price && (
+                    <p className="text-4xl font-black text-black">{formatPrice(product.price ?? 0)}</p>
+                    {product.originalPrice && product.originalPrice > (product.price ?? 0) && (
                       <p className="text-2xl text-zinc-400 line-through font-light decoration-red-500/20">{formatPrice(product.originalPrice)}</p>
                     )}
                   </>
@@ -305,7 +306,9 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               </div>
             )}
             
-            <div className="prose prose-zinc text-zinc-600 leading-[1.8] font-light border-l-4 border-black/5 pl-10 text-lg vietnamese-fix" dangerouslySetInnerHTML={{ __html: product.description }} />
+            <div className="prose prose-zinc text-zinc-600 leading-[1.8] font-light border-l-4 border-black/5 pl-10 text-lg vietnamese-fix" dangerouslySetInnerHTML={{
+  __html: product.description?.[language] ?? product.description?.vi ?? ""
+}} />
 
             <div className="pt-12">
               {isQuotationOnly ? (

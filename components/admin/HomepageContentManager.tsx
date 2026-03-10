@@ -11,6 +11,8 @@ interface HomepageContentManagerProps {
 const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config, onUpdate, products = [] }) => {
   const [editingHotspotsIdx, setEditingHotspotsIdx] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<Record<string, string>>({}); // Store search query per hotspot
+
+  const language: "vi" | "en" = "vi";
   
   const inputBase = "w-full bg-white border border-zinc-200 px-4 py-3 text-xs outline-none focus:border-black transition-all";
   const labelBase = "text-[9px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block";
@@ -49,20 +51,31 @@ const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config,
   };
 
   const addHeritageValue = (lang: 'en' | 'vi') => {
-    const newValues = { ...heritage.values };
+    const newValues = {
+  vi: [...(heritage.values?.vi || [])],
+  en: [...(heritage.values?.en || [])]
+};
     if (!newValues[lang]) newValues[lang] = [];
     newValues[lang] = [...newValues[lang], 'New Value'];
     updateHeritage('values', newValues);
   };
 
   const updateHeritageValue = (lang: 'en' | 'vi', index: number, val: string) => {
-    const newValues = { ...heritage.values };
-    newValues[lang][index] = val;
-    updateHeritage('values', newValues);
+  const newValues = {
+    vi: [...(heritage.values?.vi || [])],
+    en: [...(heritage.values?.en || [])]
   };
 
+  newValues[lang][index] = val;
+
+  updateHeritage('values', newValues);
+};
+
   const removeHeritageValue = (lang: 'en' | 'vi', index: number) => {
-    const newValues = { ...heritage.values };
+    const newValues = {
+  vi: [...(heritage.values?.vi || [])],
+  en: [...(heritage.values?.en || [])]
+};
     newValues[lang] = newValues[lang].filter((_, i) => i !== index);
     updateHeritage('values', newValues);
   };
@@ -125,11 +138,14 @@ const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config,
   const getFilteredProducts = (queryText: string) => {
     if (!queryText) return [];
     const q = queryText.toLowerCase();
-    return products.filter(p => 
-      p.name.toLowerCase().includes(q) || 
-      p.brand.toLowerCase().includes(q) ||
-      p.id.toLowerCase().includes(q)
-    ).slice(0, 5);
+    return products
+  .filter(p =>
+    (p.name.vi ?? "").toLowerCase().includes(q) ||
+    (p.name.en ?? "").toLowerCase().includes(q) ||
+    (p.brand ?? "").toLowerCase().includes(q) ||
+    p.id.toLowerCase().includes(q)
+  )
+  .slice(0, 5);
   };
 
   return (
@@ -323,9 +339,14 @@ const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config,
                                     <img src={heritage.imageMain} className="w-full h-full object-cover grayscale" alt="Heritage main preview" />
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-[9px] font-black uppercase truncate">{selectedProduct.name}</p>
-                                    <p className="text-[7px] text-zinc-400 font-bold uppercase">{selectedProduct.brand} | ID: {selectedProduct.id}</p>
-                                  </div>
+  <p className="text-[9px] font-black uppercase truncate">
+    {selectedProduct.name.vi}
+  </p>
+
+  <p className="text-[7px] text-zinc-400 font-bold uppercase">
+    {selectedProduct.brand} | ID: {selectedProduct.id}
+  </p>
+</div>
                                   <button 
                                     onClick={() => updateHotspotProductId(idx, hsIdx, "")}
                                     className="text-[8px] font-black text-blue-500 uppercase"
@@ -351,7 +372,7 @@ const HomepageContentManager: React.FC<HomepageContentManagerProps> = ({ config,
                                         >
                                           <div className="w-6 h-8 bg-zinc-100 overflow-hidden"><img src={heritage.imageSecondary} className="w-full h-full object-cover grayscale" alt="Heritage secondary preview" /></div>
                                           <div className="flex-1 min-w-0">
-                                            <p className="text-[8px] font-bold uppercase truncate">{p.name}</p>
+                                            <p className="text-[8px] font-bold uppercase truncate">{p.name[language]}</p>
                                             <p className="text-[7px] text-zinc-400 uppercase">{p.brand}</p>
                                           </div>
                                         </div>

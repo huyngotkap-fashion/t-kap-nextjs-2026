@@ -24,12 +24,12 @@ interface BlogSectionProps {
 const BlogSection: React.FC<BlogSectionProps> = ({ language, blogs, activeBlogId }) => {
   // Sắp xếp bài viết theo ngày mới nhất lên đầu
   const sortedBlogs = useMemo(() => {
-    return [...blogs].sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      return dateB - dateA;
-    });
-  }, [blogs]);
+  return [...blogs].sort((a, b) => {
+    const dateA = a.date ? new Date(a.date).getTime() : 0
+    const dateB = b.date ? new Date(b.date).getTime() : 0
+    return dateB - dateA
+  })
+}, [blogs])
 
   const selectedBlog = blogs.find(b => b.id === activeBlogId);
 
@@ -93,7 +93,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ language, blogs, activeBlogId
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
                {otherBlogs.map(blog => {
-                 const blogPath = `/blog/${createSlug(blog.title.vi || blog.title.en)}-${blog.id}`;
+                 const blogPath = `/blog/${createSlug(blog.title?.vi || blog.title?.en || "")}-${blog.id}`;
                  return (
                    <a key={blog.id} href={blogPath} className="group space-y-4">
                       <div className="aspect-video overflow-hidden bg-zinc-100 relative">
@@ -127,7 +127,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ language, blogs, activeBlogId
       {sortedBlogs.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-12">
           {sortedBlogs.map((blog) => {
-            const blogPath = `/blog/${createSlug(blog.title.vi || blog.title.en)}-${blog.id}`;
+            const blogPath = `/blog/${createSlug(blog.title?.vi || blog.title?.en || "")}-${blog.id}`;
             return (
               <a key={blog.id} href={blogPath} className="group flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-zinc-50/50 p-6 md:p-8 border border-zinc-100 hover:border-black transition-all">
                 <div className="w-full md:w-2/5 aspect-video overflow-hidden bg-zinc-100 relative shrink-0">

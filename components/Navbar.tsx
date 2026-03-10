@@ -153,18 +153,18 @@ const Navbar: React.FC<NavbarProps> = ({
       .toLowerCase();
 
   const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return [];
+  if (!searchQuery.trim()) return [];
 
-    const q = removeAccents(searchQuery);
+  const q = removeAccents(searchQuery);
 
-    return products
-      .filter((p) =>
-        [p.name, p.brand || ""].some((v) =>
-          removeAccents(v).includes(q)
-        )
+  return products
+    .filter((p) =>
+      [(p.name?.[language] ?? p.name?.vi ?? ""), p.brand ?? ""].some((v) =>
+        removeAccents(v).includes(q)
       )
-      .slice(0, 8);
-  }, [searchQuery, products]);
+    )
+    .slice(0, 8);
+}, [searchQuery, products, language]);
 
   useEffect(() => {
     if (isSearchOpen) searchRef.current?.focus();
@@ -399,7 +399,7 @@ active
 }`}
 >
 
-{(link.label[language] || link.label.vi).toUpperCase()}
+{(link.label?.[language] ?? link.label?.vi ?? "").toUpperCase()}
 
 <span
 className={`absolute left-0 -bottom-1 h-[2px] bg-white transition-all ${
@@ -550,16 +550,16 @@ className="relative"
             {searchResults.map((p) => (
               <a
                 key={p.id}
-                href={`/product/${createSlug(p.name)}-${p.id}`}
+                href={`/product/${createSlug(p.name?.[language] ?? p.name?.vi ?? "")}-${p.id}`}
                 onClick={(e) =>
                   handleLinkClick(
                     e,
-                    `/product/${createSlug(p.name)}-${p.id}`
+                    `/product/${createSlug(p.name?.[language] ?? p.name?.vi ?? "")}-${p.id}`
                   )
                 }
               >
-                <img src={p.imageUrl} alt={p.name} />
-                <p>{p.name}</p>
+                <img src={p.imageUrl} alt={p.name[language]} />
+<p>{p.name[language]}</p>
               </a>
             ))}
           </div>

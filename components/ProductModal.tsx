@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Language } from '../types';
 import { translations } from '../translations';
-import AIStylist from './AIStylist';
 
 interface ProductModalProps {
   product: Product | null;
@@ -57,7 +56,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
               <img
                 key={currentMedia?.url}
                 src={currentMedia?.url}
-                alt={product.name}
+                alt={product.name?.vi ?? ""}
+
                 className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
               />
             )}
@@ -67,7 +67,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    setActiveMediaIdx((prev) => (prev - 1 + product.media.length) % product.media.length);
+                    setActiveMediaIdx((prev) => (prev - 1 + (product.media?.length ?? 0)) % (product.media?.length ?? 1));
                   }}
                   className="absolute left-6 top-1/2 -translate-y-1/2 bg-white p-4 shadow-2xl hover:bg-black hover:text-white transition-all opacity-0 group-hover:opacity-100 z-20"
                 >
@@ -76,7 +76,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    setActiveMediaIdx((prev) => (prev + 1) % product.media.length);
+                    setActiveMediaIdx((prev) => (prev + 1) % (product.media?.length ?? 1));
                   }}
                   className="absolute right-6 top-1/2 -translate-y-1/2 bg-white p-4 shadow-2xl hover:bg-black hover:text-white transition-all opacity-0 group-hover:opacity-100 z-20"
                 >
@@ -99,7 +99,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
                   ) : (
                     <img
   src={m.url}
-  alt={product.name}
+  alt={product.name?.vi ?? ""}
   className="w-full h-full object-cover"
 />
                   )}
@@ -117,7 +117,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
                 <span className="w-1 h-1 bg-zinc-300 rounded-full"></span>
                 <span className="text-[10px] font-black tracking-[0.3em] uppercase text-zinc-900">{product.brand}</span>
               </div>
-              <h2 className="text-4xl font-serif text-zinc-900 mb-6 leading-[1.1] uppercase font-bold">{product.name}</h2>
+              <h2 className="text-4xl font-serif text-zinc-900 mb-6 leading-[1.1] uppercase font-bold">{product.name?.[language] ?? product.name?.vi ?? ""}</h2>
               <div className="flex items-baseline gap-4">
                 {product.isContactOnly ? (
                   <p className="text-xl font-black text-zinc-400 uppercase tracking-widest">{language === 'vi' ? 'Giá: Báo giá' : 'Price upon request'}</p>
@@ -134,7 +134,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
             
             <div 
               className="prose prose-zinc prose-sm text-zinc-600 mb-12 leading-relaxed font-light border-l-2 border-zinc-100 pl-6"
-              dangerouslySetInnerHTML={{ __html: product.description }}
+              dangerouslySetInnerHTML={{
+  __html: product.description?.[language as keyof typeof product.description] ?? product.description?.vi ?? ""
+}}
             />
 
             {!product.isContactOnly && (
@@ -180,10 +182,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, language, onClose,
                 {t.addToBag}
               </button>
             )}
-
-            <div className="mt-12 border-t border-zinc-100 pt-12 min-h-[300px]">
-              <AIStylist product={product} language={language} />
-            </div>
             
             <footer className="mt-12 text-[9px] text-zinc-400 font-bold uppercase tracking-[0.2em] text-center">
               Free Express Shipping & Premium Packaging included.

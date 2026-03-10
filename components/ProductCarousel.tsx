@@ -63,7 +63,9 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products, wishlist, o
           const isCenter = offset === 0;
           const isFar = Math.abs(offset) === 2;
           const isWished = wishlist.includes(product.id);
-          const productPath = `/product/${createSlug(product.name)}-${product.id}`;
+          const name = product.name?.vi ?? "";
+
+const productPath = `/product/${createSlug(name)}-${product.id}`;
 
           return (
             <div
@@ -84,7 +86,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products, wishlist, o
                 <a href={productPath} onClick={(e) => !isCenter && e.preventDefault()}>
                   <img
                     src={product.imageUrl}
-                    alt={product.name}
+                    alt={name}
                     className={`w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 ${isCenter ? 'scale-105' : 'scale-100'}`}
                   />
                 </a>
@@ -101,17 +103,19 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products, wishlist, o
                     <span className="text-[10px] font-black tracking-[0.2em] uppercase text-zinc-300">{product.brand}</span>
                   </div>
                   <h3 className={`font-black uppercase tracking-tight leading-tight mb-2 transition-transform duration-500 group-hover:-translate-y-1 ${isCenter ? 'text-sm' : 'text-xs line-clamp-1'}`}>
-                    {product.name}
+                    {name}
                   </h3>
                   <div className="flex flex-col gap-1">
                     {product.isContactOnly ? (
                       <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Contact for price</span>
                     ) : (
                       <>
-                        <span className={`${isCenter ? 'text-sm' : 'text-xs'} font-black`}>{formatPrice(product.price)}</span>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <span className="text-[10px] text-zinc-400 line-through">{formatPrice(product.originalPrice)}</span>
-                        )}
+                        <span className={`${isCenter ? 'text-sm' : 'text-xs'} font-black`}>{formatPrice(product.price ?? 0)}</span>
+                        {product.originalPrice && product.originalPrice > (product.price ?? 0) && (
+  <span className="text-[10px] text-zinc-400 line-through">
+    {formatPrice(product.originalPrice)}
+  </span>
+)}
                       </>
                     )}
                   </div>

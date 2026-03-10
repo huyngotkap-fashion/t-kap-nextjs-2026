@@ -66,8 +66,13 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ user, language, products })
       .filter(q => q.id.startsWith('ORD-'))
       .map(q => ({
         id: q.id,
-        userId: q.userId || '',
-        items: q.productNames.map(name => ({ name, quantity: 1, price: 0, selectedSize: 'N/A' })),
+        userId: '',
+        items: (q.productNames || []).map(name => ({
+  name,
+  quantity: 1,
+  price: 0,
+  selectedSize: 'N/A'
+})),
         total: q.totalAmount || 0,
         status: q.status,
         createdAt: q.createdAt,
@@ -82,10 +87,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ user, language, products })
   const displayQuotations = useMemo(() => {
     return userQuotations
       .filter(q => !q.id.startsWith('ORD-'))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) =>
+  new Date(b.createdAt ?? "").getTime() - new Date(a.createdAt ?? "").getTime()
+);
   }, [userQuotations]);
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status?: string) => {
     if (language === 'vi') {
       switch (status) {
         case 'pending': return 'Chờ xử lý';
@@ -96,7 +103,8 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ user, language, products })
         default: return 'Đã nhận';
       }
     }
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    const s = status || "pending";
+return s.charAt(0).toUpperCase() + s.slice(1);
   };
 
   const isVi = language === 'vi';
@@ -155,7 +163,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ user, language, products })
                                <img src={products.find(p => p.id === item.id || p.name === item.name)?.imageUrl || 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?auto=format&fit=crop&q=80&w=100'} className="w-full h-full object-cover grayscale" alt="" />
                             </div>
                             <div>
-                               <p className="text-[10px] font-black uppercase leading-tight">{item.name}</p>
+                               <p className="text-[10px] font-black uppercase leading-tight">{item.name[language]}</p>
                                <p className="text-[9px] text-zinc-400 font-bold mt-1">SL: {item.quantity} | SIZE: {item.selectedSize}</p>
                                <p className="text-[10px] font-black mt-1">{item.price > 0 ? formatPrice(item.price) : (isVi ? 'Chờ báo giá' : 'Pending price')}</p>
                             </div>
@@ -193,16 +201,16 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ user, language, products })
                           REQ: {q.id.slice(-6).toUpperCase()}
                         </span>
                         <span className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest ${q.status === 'pending' ? 'bg-zinc-100 text-zinc-500' : 'bg-blue-100 text-blue-600'}`}>
-                          {getStatusLabel(q.status)}
+                          {getStatusLabel(q.status || "pending")}
                         </span>
                         <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-                          {new Date(q.createdAt).toLocaleString(isVi ? 'vi-VN' : 'en-US')}
+                          {new Date(q.createdAt || 0).toLocaleString(isVi ? 'vi-VN' : 'en-US')}
                         </span>
                       </div>
                       <div className="space-y-2">
                         <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-400">{isVi ? 'SẢN PHẨM QUAN TÂM' : 'INTERESTED PRODUCTS'}</h4>
                         <div className="flex flex-wrap gap-2">
-                          {q.productNames.map((name, i) => (
+                          {(q.productNames || []).map((name, i) => (
                             <span key={i} className="text-[10px] font-bold uppercase border border-zinc-100 px-3 py-1 bg-zinc-50">{name}</span>
                           ))}
                         </div>
