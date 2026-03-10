@@ -1,244 +1,258 @@
 import React, { useState, useEffect } from "react";
-import { addDocument, getCollectionOnce, removeDocument, upsertDocument } from "../../services/firebaseService";
+import {
+  addDocument,
+  getCollectionOnce,
+  removeDocument,
+  upsertDocument
+} from "../../services/firebaseService";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parent: string | null;
+  order?: number;
+}
 
 const CategoryManager = () => {
 
-const [categories, setCategories] = useState<any[]>([]);
-const [name, setName] = useState("");
-const [parent, setParent] = useState("");
-const [editingId, setEditingId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [name, setName] = useState("");
+  const [parent, setParent] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-useEffect(() => {
-  load();
-}, []);
+  useEffect(() => {
+    load();
+  }, []);
 
-const load = async () => {
-  const data = await getCollectionOnce("categories");
-  setCategories(data);
-};
+  const load = async () => {
+    const data = await getCollectionOnce("categories") as Category[];
 
-const resetForm = () => {
-  setName("");
-  setParent("");
-  setEditingId(null);
-};
+    const sorted = data.sort(
+      (a: Category, b: Category) => (a.order || 0) - (b.order || 0)
+    );
 
-const addCategory = async () => {
+    setCategories(sorted);
+  };
 
-  if (!name) return;
+  const resetForm = () => {
+    setName("");
+    setParent("");
+    setEditingId(null);
+  };
 
-  const slug = name
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g,"-");
+  const generateSlug = (text: string) => {
+    return text
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+  };
 
-  try {
+  const addCategory = async () => {
 
-    await addDocument("categories",{
-      name,
-      slug,
-      parent: parent || null,
-      order: Date.now()
-    });
+    if (!name.trim()) return;
 
-  } catch(err){
-    console.log("ADD ERROR:",err);
-  }
+    const slug = generateSlug(name);
 
-  resetForm();
-  load();
-};
+    try {
 
-const updateCategory = async () => {
+      await addDocument("categories", {
+        name,
+        slug,
+        parent: parent || null,
+        order: Date.now()
+      });
 
-  if (!editingId) return;
+    } catch (err) {
+      console.log("ADD ERROR:", err);
+    }
 
-  const slug = name
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g,"-");
+    resetForm();
+    load();
+  };
 
-  await upsertDocument("categories", editingId,{
-    name,
-    slug,
-    parent: parent || null
-  });
+  const updateCategory = async () => {
 
-  resetForm();
-  load();
-};
+    if (!editingId) return;
 
-const deleteCategory = async (id:string, slug:string)=>{
+    const slug = generateSlug(name);
 
-  const hasChildren = categories.some(c => c.parent === slug);
+    try {
 
-  if(hasChildren){
-    alert("Không thể xóa danh mục cha khi còn danh mục con");
-    return;
-  }
+      await upsertDocument("categories", editingId, {
+        name,
+        slug,
+        parent: parent || null
+      });
 
-  const confirmDelete = confirm("Bạn chắc chắn muốn xóa danh mục này?");
-  if(!confirmDelete) return;
+    } catch (err) {
+      console.log("UPDATE ERROR:", err);
+    }
 
-  try {
+    resetForm();
+    load();
+  };
 
-    await removeDocument("categories",id);
+  const deleteCategory = async (id: string, slug: string) => {
 
-  } catch(err){
-    console.log("DELETE ERROR:",err);
-  }
+    const hasChildren = categories.some(c => c.parent === slug);
 
-  load();
-};
+    if (hasChildren) {
+      alert("Không thể xóa danh mục cha khi còn danh mục con");
+      return;
+    }
 
-return (
+    const confirmDelete = confirm("Bạn chắc chắn muốn xóa danh mục này?");
+    if (!confirmDelete) return;
 
-<div className="space-y-10">
+    try {
 
-<h2 className="text-2xl font-bold">
-{editingId ? "Sửa danh mục" : "Thêm danh mục"}
-</h2>
+      await removeDocument("categories", id);
 
-<div className="flex gap-4">
+    } catch (err) {
+      console.log("DELETE ERROR:", err);
+    }
 
-<input
-className="border px-4 py-2"
-placeholder="Tên danh mục"
-value={name}
-onChange={e=>setName(e.target.value)}
-/>
+    load();
+  };
 
-<select
-className="border px-4 py-2"
-value={parent}
-onChange={e=>setParent(e.target.value)}
->
+  return (
 
-<option value="">Danh mục cha</option>
+    <div className="space-y-10">
 
-{categories
-.filter(c=>!c.parent)
-.sort((a,b)=>a.order-b.order)
-.map(c=>(
+      <h2 className="text-2xl font-bold">
+        {editingId ? "Sửa danh mục" : "Thêm danh mục"}
+      </h2>
 
-<option key={c.slug} value={c.slug}>
-{c.name}
-</option>
+      <div className="flex gap-4 flex-wrap">
 
-))}
+        <input
+          className="border px-4 py-2 w-64"
+          placeholder="Tên danh mục"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
 
-</select>
+        <select
+          className="border px-4 py-2"
+          value={parent}
+          onChange={e => setParent(e.target.value)}
+        >
 
-<button
-onClick={editingId ? updateCategory : addCategory}
-className="bg-black text-white px-6 py-2"
->
+          <option value="">Danh mục cha</option>
 
-{editingId ? "Cập nhật" : "Thêm"}
+          {categories
+            .filter(c => !c.parent)
+            .map(c => (
 
-</button>
+              <option key={c.slug} value={c.slug}>
+                {c.name}
+              </option>
 
-{editingId && (
+            ))}
 
-<button
-onClick={resetForm}
-className="px-4 py-2 border"
->
+        </select>
 
-Hủy
+        <button
+          onClick={editingId ? updateCategory : addCategory}
+          className="bg-black text-white px-6 py-2 rounded"
+        >
+          {editingId ? "Cập nhật" : "Thêm"}
+        </button>
 
-</button>
+        {editingId && (
 
-)}
+          <button
+            onClick={resetForm}
+            className="px-4 py-2 border rounded"
+          >
+            Hủy
+          </button>
 
-</div>
+        )}
 
-<div className="mt-10">
+      </div>
 
-{categories
-.filter(c=>!c.parent)
-.sort((a,b)=>a.order-b.order)
-.map(parent=>(
+      <div className="mt-10">
 
-<div key={parent.id} className="mb-6">
+        {categories
+          .filter(c => !c.parent)
+          .map(parent => (
 
-<div className="flex items-center gap-4">
+            <div key={parent.id} className="mb-6">
 
-<h3 className="font-bold text-lg">
-{parent.name}
-</h3>
+              <div className="flex items-center gap-4">
 
-<button
-onClick={()=>{
-setEditingId(parent.id);
-setName(parent.name);
-setParent("");
-}}
-className="text-blue-500 text-sm"
->
+                <h3 className="font-bold text-lg">
+                  {parent.name}
+                </h3>
 
-Sửa
+                <button
+                  onClick={() => {
+                    setEditingId(parent.id);
+                    setName(parent.name);
+                    setParent("");
+                  }}
+                  className="text-blue-500 text-sm"
+                >
+                  Sửa
+                </button>
 
-</button>
+                <button
+                  onClick={() => deleteCategory(parent.id, parent.slug)}
+                  className="text-red-500 text-sm"
+                >
+                  Xóa
+                </button>
 
-<button
-onClick={()=>deleteCategory(parent.id,parent.slug)}
-className="text-red-500 text-sm"
->
+              </div>
 
-Xóa
+              <div className="ml-6 mt-2 space-y-1">
 
-</button>
+                {categories
+                  .filter(c => c.parent === parent.slug)
+                  .map(sub => (
 
-</div>
+                    <div key={sub.id} className="flex items-center gap-3">
 
-<div className="ml-6">
+                      <span>- {sub.name}</span>
 
-{categories
-.filter(c=>c.parent===parent.slug)
-.map(sub=>(
+                      <button
+                        onClick={() => {
+                          setEditingId(sub.id);
+                          setName(sub.name);
+                          setParent(parent.slug);
+                        }}
+                        className="text-blue-500 text-xs"
+                      >
+                        sửa
+                      </button>
 
-<div key={sub.id} className="flex items-center gap-3">
+                      <button
+                        onClick={() => deleteCategory(sub.id, sub.slug)}
+                        className="text-red-500 text-xs"
+                      >
+                        x
+                      </button>
 
-<span>- {sub.name}</span>
+                    </div>
 
-<button
-onClick={()=>{
-setEditingId(sub.id);
-setName(sub.name);
-setParent(parent.slug);
-}}
-className="text-blue-500 text-xs"
->
+                  ))}
 
-sửa
+              </div>
 
-</button>
+            </div>
 
-<button
-onClick={()=>deleteCategory(sub.id,sub.slug)}
-className="text-red-500 text-xs"
->
+          ))}
 
-x
+      </div>
 
-</button>
+    </div>
 
-</div>
-
-))}
-
-</div>
-
-</div>
-
-))}
-
-</div>
-
-</div>
-
-);
+  );
 
 };
 

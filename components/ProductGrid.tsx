@@ -112,11 +112,15 @@ const productPath = `/product/${createSlug(name)}-${product.id}`;
             </div>
           )}
 
-          <div className="absolute bottom-4 left-4 z-10 transition-transform duration-500 group-hover:-translate-y-1">
-            <span className="text-[10px] md:text-[12px] font-black tracking-widest text-red-600 uppercase">
-              {product.brand === 'BOSS' || product.brand === 'HUGO' ? product.brand : 'T-KAP'}
-            </span>
-          </div>
+          {/* GRADIENT FOR BRAND */}
+<div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
+
+{/* BRAND LABEL */}
+<div className="absolute bottom-4 left-4 z-10 transition-transform duration-500 group-hover:-translate-y-1">
+  <span className="text-[11px] md:text-[13px] font-black tracking-widest text-red-500 uppercase drop-shadow-lg">
+    {product.brand === 'BOSS' || product.brand === 'HUGO' ? product.brand : 'T-KAP'}
+  </span>
+</div>
 
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-700"></div>
 

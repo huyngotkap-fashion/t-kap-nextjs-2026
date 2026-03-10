@@ -538,13 +538,36 @@ className="relative"
       {/* SEARCH */}
       {isSearchOpen && (
         <div className="fixed inset-0 bg-black z-[200] p-20">
-          <input
-            ref={searchRef}
-            className="text-white bg-transparent border-b border-zinc-700 text-4xl w-full"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          {/* CLOSE BUTTON */}
+  <button
+    onClick={() => {
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }}
+    className="absolute top-8 right-10 text-white text-3xl"
+  >
+    ✕
+  </button>
+          <div className="relative">
+
+<input
+  ref={searchRef}
+  className="text-white bg-transparent border-b border-zinc-700 text-4xl w-full pr-12"
+  placeholder="Search..."
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+/>
+
+{searchQuery && (
+  <button
+    onClick={() => setSearchQuery("")}
+    className="absolute right-2 top-1/2 -translate-y-1/2 text-white text-2xl"
+  >
+    ✕
+  </button>
+)}
+
+</div>
 
           <div className="grid grid-cols-4 gap-6 mt-10">
             {searchResults.map((p) => (
