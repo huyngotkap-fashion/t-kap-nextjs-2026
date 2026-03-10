@@ -129,7 +129,7 @@ const Hero: React.FC<HeroProps> = ({ language, config, activeCategory, onAction 
   const target = (b.targetMenu || "home").toLowerCase();
   const active = (activeCategory || "home").toLowerCase();
 
-  return active.includes(target);
+  return target === active || active.startsWith(target);
 });
     const groups: Record<string, BannerConfig[]> = {};
     filtered.forEach(b => {

@@ -105,7 +105,7 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
   const addHiddenLink = () => {
     const newLink: HiddenLink = {
       id: crypto.randomUUID(),
-      slug: `link-${Date.now()}`,
+      slug: `page-${Date.now()}`,
       title: "Trang nhúng mới",
       url: "https://",
       isActive: true,
@@ -355,7 +355,7 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                 <div>
                   <label className={labelBase}>Slug</label>
                   <input
-                    value={link.slug}
+                    value={link.slug || ""}
                     onChange={(e) =>
                       updateArrayItem<HiddenLink>(
                         "hiddenLinks",
@@ -363,13 +363,17 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                         (l) => ({
                           ...l,
                           slug: e.target.value
-                            .toLowerCase()
-                            .replace(/\s+/g, "-"),
+  .toLowerCase()
+  .replace(/[^a-z0-9-]/g, "")
+  .replace(/\s+/g, "-"),
                         })
                       )
                     }
                     className={inputBase}
                   />
+                  <p className="text-[10px] text-zinc-400 mt-1">
+  URL truy cập: /{link.slug}
+</p>
                 </div>
 
                 <div>
@@ -380,7 +384,8 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                       updateArrayItem<HiddenLink>(
                         "hiddenLinks",
                         link.id,
-                        (l) => ({ ...l, url: e.target.value })
+                        (l) => ({ ...l, url: isValidUrl(e.target.value) ? e.target.value : l.url,
+})
                       )
                     }
                     className={`${inputBase} ${
@@ -415,6 +420,13 @@ const NavigationManager: React.FC<NavigationManagerProps> = ({
                 >
                   Xóa
                 </button>
+                <a
+  href={`/${link.slug}`}
+  target="_blank"
+  className="text-blue-600 text-xs font-bold underline"
+>
+  Mở trang
+</a>
 
               </div>
             </div>

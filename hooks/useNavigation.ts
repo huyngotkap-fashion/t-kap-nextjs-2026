@@ -90,7 +90,7 @@ return { type: 'page', slug: 'all' };
 
     return (siteConfig.hiddenLinks || []).find(
       (link) =>
-        link.id.toLowerCase() === routeInfo.slug && link.isActive
+        link.slug?.toLowerCase() === routeInfo.slug && link.isActive
     );
   }, [siteConfig.hiddenLinks, routeInfo]);
 
@@ -109,6 +109,8 @@ return { type: 'page', slug: 'all' };
   const category = parts[0];
   const subcategory = parts[1];
 
+  if (category === 'admin') return 'Admin';
+
   if (subcategory) return subcategory;
 
   if (category === 'men') return 'men';
@@ -118,7 +120,6 @@ return { type: 'page', slug: 'all' };
   if (category === 'quotation') return 'Quotation';
   if (category === 'checkout') return 'Checkout';
   if (category === 'history') return 'History';
-  if (category === 'admin') return 'Admin';
 }
 
     return 'All';

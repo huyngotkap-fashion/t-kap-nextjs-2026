@@ -69,18 +69,20 @@ useNavigation(
   const renderContent = () => {
     if (!isConfigLoaded) return <div className="h-screen flex items-center justify-center"><div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
-    if (activeCategory === 'HiddenLink' && matchedHiddenLink) {
-      return (
-        <div className="w-full h-[calc(100vh-70px)] md:h-[calc(100vh-115px)] animate-reveal">
-           <iframe 
-             src={matchedHiddenLink.url} 
-             className="w-full h-full border-none" 
-             title={matchedHiddenLink.title}
-             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-           />
-        </div>
-      );
-    }
+    if (matchedHiddenLink) {
+  return (
+    <div className="w-full bg-white">
+      <iframe
+        src={matchedHiddenLink.url}
+        className="w-full border-0"
+        style={{
+          height: "auto",
+          minHeight: "800px"
+        }}
+      />
+    </div>
+  );
+}
 
     if ((activeCategory === 'Landing' || matchedLandingPage) && matchedLandingPage) {
   return <LandingPageRenderer page={matchedLandingPage} language={language} />;
@@ -162,7 +164,7 @@ const filtered = products.filter(p => {
   const slugParts = slug?.split("/") || [];
 
   const urlCategory = normalize(slugParts[0] || "");
-  const urlSub = slugParts[1];
+  const urlSub = normalize(slugParts[1] || "");
 
   if (urlSub) {
     return category === urlCategory && sub === urlSub;
@@ -173,12 +175,14 @@ const filtered = products.filter(p => {
 
   return (
     <>
-      <Hero
-        language={language}
-        config={siteConfig}
-        activeCategory={activeCategory}
-        onAction={navigate}
-      />
+      {!matchedHiddenLink && (
+  <Hero
+    language={language}
+    config={siteConfig}
+    activeCategory={subSlug || categorySlug || activeCategory}
+    onAction={navigate}
+  />
+)}
 
       {/* SEO CONTENT */}
       <section className="max-w-[1200px] mx-auto px-6 md:px-12 py-16">
