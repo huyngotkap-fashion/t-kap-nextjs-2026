@@ -125,9 +125,12 @@ const BannerSlider: React.FC<{
 
 const Hero: React.FC<HeroProps> = ({ language, config, activeCategory, onAction }) => {
   const bannerGroups = useMemo(() => {
-    const filtered = (config.banners ?? []).filter(
-  (b) => b.targetMenu === activeCategory
-);
+    const filtered = (config.banners ?? []).filter((b) => {
+  const target = (b.targetMenu || "home").toLowerCase();
+  const active = (activeCategory || "home").toLowerCase();
+
+  return active.includes(target);
+});
     const groups: Record<string, BannerConfig[]> = {};
     filtered.forEach(b => {
       const gid = b.sliderGroupId || 'default';

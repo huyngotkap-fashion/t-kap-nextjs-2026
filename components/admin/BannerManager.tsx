@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { SiteConfig, BannerConfig } from "../../types";
 
 interface BannerManagerProps {
@@ -12,25 +12,23 @@ const BannerManager: React.FC<BannerManagerProps> = ({
   config,
   onUpdate,
 }) => {
+
   const banners = useMemo(
-  () => config?.banners ?? [],
-  [config?.banners]
-);
+    () => config?.banners ?? [],
+    [config?.banners]
+  );
 
-  const inputBase =
-    "w-full bg-white border border-zinc-200 px-4 py-3 text-xs outline-none focus:border-black transition-all";
+  const [openSection, setOpenSection] = useState<string | null>("content");
 
-  const labelBase =
-    "text-[9px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block";
+  const input =
+    "w-full border border-zinc-200 px-3 py-2 text-xs focus:border-black outline-none";
 
-  /* =============================
-     HELPERS
-  ============================== */
+  const label =
+    "text-[9px] font-bold uppercase tracking-widest text-zinc-400 mb-1 block";
 
-  const safeNumber = (value: string) => {
-    const parsed = Number(value);
-    return isNaN(parsed) ? 0 : parsed;
-  };
+  /* ====================== */
+  /* UPDATE CONFIG */
+  /* ====================== */
 
   const updateConfig = useCallback(
     (newBanners: BannerConfig[]) => {
@@ -42,247 +40,451 @@ const BannerManager: React.FC<BannerManagerProps> = ({
     [config, onUpdate]
   );
 
-  /* =============================
-     ADD BANNER
-  ============================== */
+  /* ====================== */
+  /* ADD BANNER (TOP) */
+  /* ====================== */
 
-  const addBanner = useCallback(
-    (groupId?: string) => {
-      const newBanner: BannerConfig = {
-        id: crypto.randomUUID(),
-        type: "image",
-        url: "",
-        title: { en: "", vi: "Tiêu đề Banner Mới" },
-        description: { en: "", vi: "Mô tả ngắn cho banner" },
-        logoType: "text",
-        logoText: "T-KAP",
-        bannerLogoRedirect: "All",
-        primaryBtnText: { en: "", vi: "XEM NGAY" },
-        primaryBtnLink: "/",
-        secondaryBtnText: { en: "", vi: "" },
-        secondaryBtnLink: "/",
-        displayMode: "slider",
-        targetMenu: "All",
-        sliderGroupId: groupId ?? "slider-1",
-        order: banners.length + 1,
-      };
+  const addBanner = (groupId?: string) => {
 
-      updateConfig([...banners, newBanner]);
-    },
-    [banners, updateConfig]
-  );
+    const newBanner: BannerConfig = {
+      id: crypto.randomUUID(),
+      type: "image",
+      url: "",
+      title: { en: "", vi: "Banner mới" },
+      description: { en: "", vi: "" },
+      primaryBtnText: { en: "", vi: "Xem ngay" },
+      primaryBtnLink: "/",
+      secondaryBtnText: { en: "", vi: "" },
+      secondaryBtnLink: "/",
+      displayMode: "slider",
+      targetMenu: "home",
+      sliderGroupId: groupId ?? "main-slider",
+      order: 0
+    };
 
-  /* =============================
-     UPDATE BANNER (SAFE)
-  ============================== */
+    const newList = [newBanner, ...banners];
 
-  const updateBanner = useCallback(
-    (bannerId: string, field: string, value: unknown) => {
-      const updated = banners.map((banner) => {
-        if (banner.id !== bannerId) return banner;
+    updateConfig(newList);
 
-        const clone: BannerConfig = { ...banner };
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-        if (field.includes(".")) {
-  const [parent, child] = field.split(".");
-  const parentKey = parent as keyof BannerConfig;
+  /* ====================== */
+  /* UPDATE FIELD */
+  /* ====================== */
 
-  const parentValue = clone[parentKey];
+  const updateBanner = (
+    id: string,
+    field: string,
+    value: any
+  ) => {
 
-  if (typeof parentValue === "object" && parentValue !== null) {
-    (parentValue as unknown as Record<string, unknown>)[child] = value;
-  }
-} else {
-  (clone as unknown as Record<string, unknown>)[field] = value;
-}
+    const updated = banners.map((b) => {
 
-        return clone;
-      });
+      if (b.id !== id) return b;
 
-      updateConfig(updated);
-    },
-    [banners, updateConfig]
-  );
+      const clone: any = { ...b };
 
-  /* =============================
-     REMOVE
-  ============================== */
+      if (field.includes(".")) {
 
-  const removeBanner = useCallback(
-    (id: string) => {
-      updateConfig(banners.filter((b) => b.id !== id));
-    },
-    [banners, updateConfig]
-  );
+        const [parent, child] = field.split(".");
 
-  /* =============================
-     GROUPED BANNERS
-  ============================== */
+        clone[parent] = {
+          ...clone[parent],
+          [child]: value
+        };
 
-  const groupedBanners = useMemo(() => {
+      } else {
+        clone[field] = value;
+      }
+
+      return clone;
+    });
+
+    updateConfig(updated);
+  };
+
+  /* ====================== */
+  /* REMOVE */
+  /* ====================== */
+
+  const removeBanner = (id: string) => {
+    updateConfig(banners.filter((b) => b.id !== id));
+  };
+
+  /* ====================== */
+  /* GROUP */
+  /* ====================== */
+
+  const grouped = useMemo(() => {
+
     const groups: Record<string, BannerConfig[]> = {};
 
     banners.forEach((b) => {
-      const gid = b.sliderGroupId ?? "unassigned";
+
+      const gid = b.sliderGroupId ?? "main-slider";
+
       if (!groups[gid]) groups[gid] = [];
+
       groups[gid].push(b);
     });
 
-    Object.keys(groups).forEach((key) => {
-      groups[key].sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0)
-      );
-    });
-
     return groups;
+
   }, [banners]);
 
-  /* =============================
-     UI
-  ============================== */
+  /* ====================== */
+  /* UI */
+  /* ====================== */
 
   return (
-    <div className="animate-reveal pb-20 space-y-16">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-10 border-b border-zinc-100 pb-6">
-        <div>
-          <h3 className="text-2xl font-black uppercase tracking-tight">
-            Quản lý Banner Slider
-          </h3>
-          <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-2">
-            Phân nhóm và sắp xếp thứ tự hiển thị
-          </p>
-        </div>
+
+    <div className="space-y-12 pb-20">
+
+      {/* HEADER */}
+
+      <div className="flex justify-between items-center border-b pb-4">
+
+        <h2 className="text-xl font-black uppercase">
+          Banner Manager
+        </h2>
 
         <button
           onClick={() => addBanner()}
-          className="bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all shadow-lg"
+          className="bg-black text-white px-6 py-3 text-xs font-bold hover:bg-zinc-800"
         >
-          + THÊM BANNER MỚI
+          + Thêm banner
         </button>
+
       </div>
 
-      {/* GROUPS */}
-      {Object.entries(groupedBanners).map(([groupId, groupItems]) => (
-        <div key={groupId} className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="h-px flex-1 bg-zinc-200" />
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-500 bg-zinc-50 px-4 py-1 rounded-full border border-zinc-200">
-              Nhóm: {groupId} ({groupItems.length})
-            </h4>
-            <div className="h-px flex-1 bg-zinc-200" />
-          </div>
+      {Object.entries(grouped).map(([groupId, items]) => (
 
-          {groupItems.map((b) => (
+        <div key={groupId} className="space-y-6">
+
+          <h3 className="text-xs uppercase font-black text-zinc-500">
+            Nhóm: {groupId}
+          </h3>
+
+          {items.map((b) => (
+
             <div
               key={b.id}
-              className="bg-white border border-zinc-200 p-8 shadow-md hover:shadow-xl transition-all flex flex-col lg:flex-row gap-8 relative"
+              className="border bg-white p-6 flex flex-col lg:flex-row gap-8 shadow-sm"
             >
-              {/* ORDER BADGE */}
-              <div className="absolute top-0 left-0 bg-black text-white w-10 h-10 flex items-center justify-center font-black text-sm">
-                {b.order ?? "#"}
-              </div>
 
-              {/* LEFT */}
-              <div className="w-full lg:w-1/4 space-y-4">
-                <div className="aspect-video bg-zinc-100 border border-zinc-200 overflow-hidden relative">
+              {/* PREVIEW */}
+
+              <div className="lg:w-1/3 space-y-3">
+
+                <div className="aspect-video bg-zinc-100 overflow-hidden">
+
                   {b.type === "video" ? (
+
                     <video
                       src={b.url}
-                      className="w-full h-full object-cover"
                       controls
-                    />
-                  ) : (
-                    <img
-                      src={b.url}
-                      alt=""
                       className="w-full h-full object-cover"
                     />
+
+                  ) : (
+
+                    <img
+  src={b.url}
+  alt=""
+  className="w-full h-full object-cover"
+/>
+
                   )}
+
                 </div>
 
-                <div>
-                  <label className={labelBase}>Thứ tự</label>
-                  <input
-                    type="number"
-                    value={b.order ?? 0}
-                    onChange={(e) =>
-                      updateBanner(
-                        b.id,
-                        "order",
-                        safeNumber(e.target.value)
-                      )
-                    }
-                    className={inputBase}
-                  />
-                </div>
               </div>
 
-              {/* RIGHT */}
-              <div className="flex-1 space-y-4">
-                <div>
-                  <label className={labelBase}>Tiêu đề (VI)</label>
-                  <input
-                    value={b.title?.vi ?? ""}
-                    onChange={(e) =>
-                      updateBanner(
-                        b.id,
-                        "title.vi",
-                        e.target.value
-                      )
-                    }
-                    className={inputBase}
-                  />
-                </div>
+              {/* SETTINGS */}
+
+              <div className="flex-1 space-y-6">
+
+                {/* CONTENT */}
 
                 <div>
-                  <label className={labelBase}>URL Media</label>
-                  <input
-                    value={b.url ?? ""}
-                    onChange={(e) =>
-                      updateBanner(
-                        b.id,
-                        "url",
-                        e.target.value
+
+                  <button
+                    onClick={() =>
+                      setOpenSection(
+                        openSection === "content"
+                          ? null
+                          : "content"
                       )
                     }
-                    className={inputBase}
-                  />
+                    className="font-bold text-xs uppercase"
+                  >
+                    Nội dung
+                  </button>
+
+                  {openSection === "content" && (
+
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+
+                      <div>
+                        <label className={label}>
+                          Tiêu đề
+                        </label>
+                        <input
+                          className={input}
+                          value={b.title?.vi ?? ""}
+                          onChange={(e) =>
+                            updateBanner(
+                              b.id,
+                              "title.vi",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <label className={label}>
+                          Text nhỏ
+                        </label>
+                        <input
+                          className={input}
+                          value={b.description?.vi ?? ""}
+                          onChange={(e) =>
+                            updateBanner(
+                              b.id,
+                              "description.vi",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+
+                    </div>
+
+                  )}
+
                 </div>
+
+                {/* BUTTONS */}
+
+                <div>
+
+                  <button
+                    onClick={() =>
+                      setOpenSection(
+                        openSection === "buttons"
+                          ? null
+                          : "buttons"
+                      )
+                    }
+                    className="font-bold text-xs uppercase"
+                  >
+                    Buttons
+                  </button>
+
+                  {openSection === "buttons" && (
+
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+
+                      <input
+                        className={input}
+                        placeholder="Text nút chính"
+                        value={b.primaryBtnText?.vi ?? ""}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "primaryBtnText.vi",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <input
+                        className={input}
+                        placeholder="Link nút chính"
+                        value={b.primaryBtnLink ?? ""}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "primaryBtnLink",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <input
+                        className={input}
+                        placeholder="Text nút phụ"
+                        value={b.secondaryBtnText?.vi ?? ""}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "secondaryBtnText.vi",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <input
+                        className={input}
+                        placeholder="Link nút phụ"
+                        value={b.secondaryBtnLink ?? ""}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "secondaryBtnLink",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                    </div>
+
+                  )}
+
+                </div>
+
+                {/* MEDIA */}
+
+                <div>
+
+                  <button
+                    onClick={() =>
+                      setOpenSection(
+                        openSection === "media"
+                          ? null
+                          : "media"
+                      )
+                    }
+                    className="font-bold text-xs uppercase"
+                  >
+                    Media
+                  </button>
+
+                  {openSection === "media" && (
+
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+
+                      <select
+                        className={input}
+                        value={b.type}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "type",
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="image">Ảnh</option>
+                        <option value="video">Video</option>
+                      </select>
+
+                      <input
+                        className={input}
+                        placeholder="URL media"
+                        value={b.url}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "url",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                    </div>
+
+                  )}
+
+                </div>
+
+                {/* DISPLAY */}
+
+                <div>
+
+                  <button
+                    onClick={() =>
+                      setOpenSection(
+                        openSection === "display"
+                          ? null
+                          : "display"
+                      )
+                    }
+                    className="font-bold text-xs uppercase"
+                  >
+                    Display
+                  </button>
+
+                  {openSection === "display" && (
+
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+
+                      <select
+                        className={input}
+                        value={b.targetMenu}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "targetMenu",
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="home">Trang chủ</option>
+                        <option value="men">Nam</option>
+                        <option value="journal">Tin tức</option>
+                        <option value="uniform">Đồng phục</option>
+                      </select>
+
+                      <input
+                        type="number"
+                        className={input}
+                        value={b.order ?? 0}
+                        onChange={(e) =>
+                          updateBanner(
+                            b.id,
+                            "order",
+                            Number(e.target.value)
+                          )
+                        }
+                      />
+
+                    </div>
+
+                  )}
+
+                </div>
+
+                {/* DELETE */}
 
                 <button
                   onClick={() => removeBanner(b.id)}
-                  className="w-10 h-10 bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all"
+                  className="text-red-500 text-xs font-bold"
                 >
-                  ✕
+                  Xóa banner
                 </button>
+
               </div>
+
             </div>
+
           ))}
 
           <button
             onClick={() => addBanner(groupId)}
-            className="w-full py-4 border-2 border-dashed border-zinc-200 text-zinc-400 text-[10px] font-black uppercase tracking-widest hover:border-black hover:text-black transition-all bg-white/50"
+            className="w-full border-2 border-dashed py-3 text-xs uppercase text-zinc-400 hover:border-black hover:text-black"
           >
             + Thêm banner vào nhóm {groupId}
           </button>
+
         </div>
+
       ))}
 
-      {banners.length === 0 && (
-        <div className="py-24 text-center border-4 border-dashed border-zinc-100 rounded-xl">
-          <p className="text-zinc-300 font-bold uppercase tracking-widest">
-            Chưa có banner nào được tạo
-          </p>
-          <button
-            onClick={() => addBanner()}
-            className="mt-4 bg-black text-white px-8 py-3 text-[10px] font-bold uppercase tracking-widest"
-          >
-            Khởi tạo Banner đầu tiên
-          </button>
-        </div>
-      )}
     </div>
+
   );
 };
 

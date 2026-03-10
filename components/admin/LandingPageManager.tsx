@@ -17,7 +17,10 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ user }) => {
 
   useEffect(() => {
     const unsub = subscribeToCollection('landingPages', (data) => {
-      setPages(data as LandingPage[]);
+      setPages(
+  (data as LandingPage[])
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+);
       setLoading(false);
     });
     return () => unsub();
@@ -25,12 +28,13 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ user }) => {
 
   const createNewPage = () => {
     const newPage: LandingPage = {
-      id: `lp-${Date.now()}`,
-      title: 'Trang chiến dịch mới',
-      isActive: false,
-      showInMenu: false, // Mặc định là false
-      blocks: []
-    };
+  id: `lp-${Date.now()}`,
+  title: 'Trang chiến dịch mới',
+  isActive: false,
+  showInMenu: false,
+  createdAt: Date.now(),
+  blocks: []
+};
     setEditingPage(newPage);
     setIsEditing(true);
   };
@@ -63,17 +67,24 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ user }) => {
       }
 
       const dataToSave = { 
-        ...editingPage, 
-        id: sanitizedId,
-        showInMenu: !!editingPage.showInMenu, // Đảm bảo luôn có giá trị boolean
-        blocks: (editingPage.blocks || []).map(b => ({
-          ...b,
-          imageUrl: b.imageUrl || "",
-          videoUrl: b.videoUrl || "",
-          buttonLink: b.buttonLink || "",
-          layout: b.layout || "left"
-        }))
-      };
+  ...editingPage,
+  id: sanitizedId,
+  createdAt: editingPage.createdAt || Date.now(),
+  showInMenu: !!editingPage.showInMenu,
+  blocks: (editingPage.blocks || []).map(b => ({
+  ...b,
+  content: {
+    ...b.content,
+    imageUrl: b.content?.imageUrl || "",
+    videoUrl: b.content?.videoUrl || "",
+    buttonLink: b.content?.buttonLink || "",
+  },
+  settings: {
+    ...b.settings,
+    layout: b.settings?.layout || "left"
+  }
+}))
+};
 
       await upsertDocument('landingPages', sanitizedId, dataToSave);
       setIsEditing(false);

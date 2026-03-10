@@ -40,5 +40,5 @@ export const metadata: Metadata = {
 };
 
 export default function JournalPage() {
-  return <ClientApp />;
+  return <ClientApp initialCategory="journal" />;
 }

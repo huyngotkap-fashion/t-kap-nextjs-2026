@@ -114,7 +114,7 @@ useNavigation(
         <Hero
           language={language}
           config={siteConfig}
-          activeCategory="Blog"
+          activeCategory="journal"
           onAction={navigate}
         />
       )}
@@ -161,7 +161,7 @@ const filtered = products.filter(p => {
 
   const slugParts = slug?.split("/") || [];
 
-  const urlCategory = slugParts[0];
+  const urlCategory = normalize(slugParts[0] || "");
   const urlSub = slugParts[1];
 
   if (urlSub) {

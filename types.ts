@@ -179,7 +179,22 @@ export interface LandingPage {
 
   showInMenu?: boolean;
 
-  blocks?: any[];
+  /** nếu true: trang vẫn truy cập được nhưng không hiển thị trên menu */
+  hiddenLink?: boolean;
+
+  /** thời gian tạo - dùng để sort admin */
+  createdAt?: number;
+
+  /** thời gian cập nhật */
+  updatedAt?: number;
+
+  /** SEO title */
+  seoTitle?: string;
+
+  /** SEO description */
+  seoDescription?: string;
+
+  blocks?: LPBlock[];
 }
 
 /* =========================
@@ -497,6 +512,9 @@ export interface LPBlock {
     | "banner"
     | "spacer";
 
+  /** thời gian tạo block */
+  createdAt?: number;
+
   content?: {
     title?: LocalizedText;
     subtitle?: LocalizedText;
@@ -519,10 +537,13 @@ export interface LPBlock {
     layout?: "left" | "right";
   };
 
+  /** product list nếu là product-grid */
   products?: string[];
 
+  /** thứ tự block */
   order?: number;
 
+  /** block có active hay không */
   isActive?: boolean;
 }
 /* =========================
